@@ -9,12 +9,12 @@
 	{#if file.type === 'directory'}
 		<div class="item">
 			<span>📁</span>
-			<a href={resolve('/[...path]', { path: file.path })}>{file.name}</a>
+			<a href={resolve('/files/[...path]', { path: file.path })}>{file.name}</a>
 		</div>
 	{:else if file.type === 'file'}
 		<div class="item">
 			<span></span>
-			<a href={resolve('/files/[...path]', { path: file.path })}>{file.name}</a>
+			<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
 		</div>
 	{/if}
 {/each}
