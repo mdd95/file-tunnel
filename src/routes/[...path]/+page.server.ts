@@ -31,8 +31,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
 		files.push({
 			name: entry.name,
+			type: entry.isDirectory() ? 'directory' : 'file',
 			modified: entryStat.mtimeMs,
-			path: '/' + getRelativePath(absolutePath, entry.name)
+			path: getRelativePath(absolutePath, entry.name)
 		});
 	}
 
