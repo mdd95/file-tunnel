@@ -1,32 +1,10 @@
 import mime from 'mime-types';
 import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
-import path from 'node:path';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
-import { ROOT_DIR } from '$env/static/private';
+import { safeRootPath } from '$lib/utils.js';
 import type { RequestHandler } from './$types';
-
-function normalizePath(value = ''): string {
-	return value.replaceAll('\\', '/').replace(/^\/+/, '').replace(/\/+/g, '/');
-}
-
-function isInsideRoot(root: string, target: string): boolean {
-	return target === root || target.startsWith(root + path.sep);
-}
-
-async function safeRootPath(relativePath = ''): Promise<string | null> {
-	try {
-		const root = await fs.realpath(ROOT_DIR);
-		const normalized = normalizePath(relativePath);
-		const resolved = path.resolve(root, normalized);
-		const realPath = await fs.realpath(resolved);
-		if (!isInsideRoot(root, realPath)) return null;
-		return realPath;
-	} catch {
-		return null;
-	}
-}
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	const absolutePath = await safeRootPath(params.path);
