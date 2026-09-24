@@ -4,6 +4,22 @@ import { error } from '@sveltejs/kit';
 import { getRelativePath, safeRootPath } from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
 
+const IMAGE_EXT = new Set([
+	'.jpg',
+	'.jpeg',
+	'.png',
+	'.webp',
+	'.avif',
+	'.gif',
+	'.bmp',
+	'.tif',
+	'.tiff'
+]);
+
+function isImage(fileName: string): boolean {
+	return IMAGE_EXT.has(path.extname(fileName).toLowerCase());
+}
+
 export const load: PageServerLoad = async ({ params }) => {
 	const absolutePath = await safeRootPath(params.path);
 
@@ -32,10 +48,22 @@ export const load: PageServerLoad = async ({ params }) => {
 		files.push({
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
+			path: getRelativePath(absolutePath, entry.name),
+			size: entry.isDirectory() ? null : entryStat.size,
 			modified: entryStat.mtimeMs,
-			path: getRelativePath(absolutePath, entry.name)
+			isImage: entry.isFile() && isImage(entry.name)
 		});
 	}
+
+	files.sort((a, b) => {
+		if (a.type !== b.type) {
+			return a.type === 'directory' ? -1 : 1;
+		}
+		return a.name.localeCompare(b.name, undefined, {
+			numeric: true,
+			sensitivity: 'base'
+		});
+	});
 
 	return { files };
 };
