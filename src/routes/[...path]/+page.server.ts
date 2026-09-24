@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { safeRootPath } from '$lib/utils.js';
+import { getRelativePath, safeRootPath } from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -28,9 +28,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		} catch {
 			continue;
 		}
+
 		files.push({
 			name: entry.name,
-			modified: entryStat.mtimeMs
+			modified: entryStat.mtimeMs,
+			path: '/' + getRelativePath(absolutePath, entry.name)
 		});
 	}
 

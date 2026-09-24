@@ -22,3 +22,8 @@ export async function safeRootPath(relativePath = ''): Promise<string | null> {
 		return null;
 	}
 }
+
+export function getRelativePath(directory: string, fileName: string): string {
+	const relative = path.relative(ROOT_DIR, path.join(directory, fileName));
+	return relative.split(path.sep).join('/');
+}

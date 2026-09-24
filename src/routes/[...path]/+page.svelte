@@ -4,4 +4,9 @@
 	let { data }: PageProps = $props();
 </script>
 
-<pre>{JSON.stringify(data, null, 2)}</pre>
+{#each data.files as file (file.name)}
+	<div>
+		<a href={file.path}>{file.name}</a>
+		<p>{file.path}</p>
+	</div>
+{/each}
