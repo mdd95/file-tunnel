@@ -20,7 +20,7 @@ function isImage(fileName: string): boolean {
 	return IMAGE_EXT.has(path.extname(fileName).toLowerCase());
 }
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
 	const absolutePath = await safeRootPath(params.path);
 
 	if (!absolutePath) {
@@ -45,13 +45,16 @@ export const load: PageServerLoad = async ({ params }) => {
 			continue;
 		}
 
+		const entryPath = getRelativePath(absolutePath, entry.name);
+
 		files.push({
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
-			path: getRelativePath(absolutePath, entry.name),
+			path: entryPath,
 			size: entry.isDirectory() ? null : entryStat.size,
 			modified: entryStat.mtimeMs,
-			isImage: entry.isFile() && isImage(entry.name)
+			isImage: entry.isFile() && isImage(entry.name),
+			viewPath: `${url.origin}/view/${entryPath}`
 		});
 	}
 
