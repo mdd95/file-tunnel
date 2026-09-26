@@ -33,6 +33,7 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
-		"mime-types": "^3.0.2"
+		"mime-types": "^3.0.2",
+		"sharp": "^0.35.4"
 	}
 }

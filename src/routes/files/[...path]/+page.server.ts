@@ -1,24 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { getRelativePath, safeRootPath } from '$lib/utils.js';
+import { getRelativePath, isImage, safeRootPath } from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
-
-const IMAGE_EXT = new Set([
-	'.jpg',
-	'.jpeg',
-	'.png',
-	'.webp',
-	'.avif',
-	'.gif',
-	'.bmp',
-	'.tif',
-	'.tiff'
-]);
-
-function isImage(fileName: string): boolean {
-	return IMAGE_EXT.has(path.extname(fileName).toLowerCase());
-}
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const absolutePath = await safeRootPath(params.path);
@@ -54,7 +38,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			size: entry.isDirectory() ? null : entryStat.size,
 			modified: entryStat.mtimeMs,
 			isImage: entry.isFile() && isImage(entry.name),
-			viewPath: `${url.origin}/view/${entryPath}`
+			viewPath: `${url.origin}/view/${entryPath}`,
+			thumbnailPath:
+				entry.isFile() && isImage(entry.name)
+					? `${url.origin}/thumbnail/${entryPath}`
+					: null
 		});
 	}
 
