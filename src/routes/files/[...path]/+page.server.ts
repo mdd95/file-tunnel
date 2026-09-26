@@ -1,16 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { getRelativePath, isImage, safeRootPath } from '$lib/utils.js';
+import { getRelativePath, isImage, resolvePath } from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, url }) => {
-	const absolutePath = await safeRootPath(params.path);
-
-	if (!absolutePath) {
-		error(404, 'File not found');
-	}
-
+	const absolutePath = await resolvePath(params.path);
 	const stat = await fs.stat(absolutePath);
 	if (!stat.isDirectory()) {
 		error(400, 'Not a directory');

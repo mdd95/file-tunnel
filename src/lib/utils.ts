@@ -1,26 +1,23 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { error } from '@sveltejs/kit';
 import { ROOT_DIR, THUMBNAIL_DIR } from '$env/static/private';
 
 export function normalizePath(value = ''): string {
 	return value.replaceAll('\\', '/').replace(/^\/+/, '').replace(/\/+/g, '/');
 }
 
-export function isInsideRoot(root: string, target: string): boolean {
-	return target === root || target.startsWith(root + path.sep);
-}
-
-export async function safeRootPath(relativePath = ''): Promise<string | null> {
+export async function resolvePath(relativePath = ''): Promise<string | never> {
 	try {
 		const root = await fs.realpath(ROOT_DIR);
-		const normalized = normalizePath(relativePath);
-		const resolved = path.resolve(root, normalized);
-		const realPath = await fs.realpath(resolved);
-		if (!isInsideRoot(root, realPath)) return null;
-		return realPath;
+		const target = await fs.realpath(path.resolve(root, normalizePath(relativePath)));
+		if (!(target === root || target.startsWith(root + path.sep))) {
+			error(404, 'Not found');
+		}
+		return target;
 	} catch {
-		return null;
+		error(404, 'Not found');
 	}
 }
 

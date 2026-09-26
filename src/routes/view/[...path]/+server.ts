@@ -3,16 +3,11 @@ import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
-import { safeRootPath } from '$lib/utils.js';
+import { resolvePath } from '$lib/utils.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const absolutePath = await safeRootPath(params.path);
-
-	if (!absolutePath) {
-		error(404, 'File not found');
-	}
-
+	const absolutePath = await resolvePath(params.path);
 	try {
 		const stat = await fs.stat(absolutePath);
 
