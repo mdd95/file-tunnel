@@ -1,42 +1,48 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { getRelativePath, isImage, resolvePath } from '$lib/utils.js';
+import {
+	blockNotDirectory,
+	getRelativePath,
+	isImage,
+	normalizePath,
+	resolvePath
+} from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, url }) => {
-	const absolutePath = await resolvePath(params.path);
-	const stat = await fs.stat(absolutePath);
-	if (!stat.isDirectory()) {
-		error(400, 'Not a directory');
-	}
+	const target = await resolvePath(params.path);
+	await blockNotDirectory(target);
 
-	const entries = await fs.readdir(absolutePath, { withFileTypes: true });
+	let entries;
+	try {
+		entries = await fs.readdir(target, { withFileTypes: true });
+	} catch {
+		error(400, `Error reading directory: ${target}`);
+	}
 	const files = [];
 
 	for (const entry of entries) {
-		const entryAbsolutePath = path.join(absolutePath, entry.name);
+		const entryPath = path.join(target, entry.name);
 		let entryStat;
-
 		try {
-			entryStat = await fs.stat(entryAbsolutePath);
+			entryStat = await fs.stat(entryPath);
 		} catch {
 			continue;
 		}
 
-		const entryPath = getRelativePath(absolutePath, entry.name);
-
+		const entryRelativePath = getRelativePath(target, entry.name);
 		files.push({
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
-			path: entryPath,
+			path: entryRelativePath,
 			size: entry.isDirectory() ? null : entryStat.size,
 			modified: entryStat.mtimeMs,
 			isImage: entry.isFile() && isImage(entry.name),
-			viewPath: `${url.origin}/view/${entryPath}`,
+			viewPath: `${url.origin}/view/${entryRelativePath}`,
 			thumbnailPath:
 				entry.isFile() && isImage(entry.name)
-					? `${url.origin}/thumbnail/${entryPath}`
+					? `${url.origin}/thumbnail/${entryRelativePath}`
 					: null
 		});
 	}
@@ -51,5 +57,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		});
 	});
 
-	return { files };
+	return {
+		parentPath: normalizePath(params.path).split('/').slice(0, -1).join('/'),
+		files
+	};
 };
