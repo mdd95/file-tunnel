@@ -11,10 +11,11 @@
 
 <header>
 	<div>
-		<button class="btn btn-icon">&LeftArrow;</button>
-		<button class="btn btn-icon">&RightArrow;</button>
-		<button class="btn btn-icon">&UpArrow;</button>
-		<button class="btn btn-icon">&#x27F3;</button>
+		<button class="btn btn-icon" onclick={() => window.history.back()}>&LeftArrow;</button>
+		<button class="btn btn-icon" onclick={() => window.history.forward()}>&RightArrow;</button>
+		<a href={resolve('/files/[...path]', { path: data.parentPath })} class="btn btn-icon">
+			&UpArrow;
+		</a>
 	</div>
 	<div class="location">
 		<button class="btn">Home</button>
