@@ -38,7 +38,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			path: entryRelativePath,
 			size: entry.isDirectory() ? null : entryStat.size,
 			modified: entryStat.mtimeMs,
-			isImage: entry.isFile() && isImage(entry.name),
 			viewPath: `${url.origin}/view/${entryRelativePath}`,
 			thumbnailPath:
 				entry.isFile() && isImage(entry.name)

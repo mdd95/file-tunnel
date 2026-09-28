@@ -7,6 +7,13 @@
 	$effect(() => {
 		console.log(data);
 	});
+
+	const IMG_EXT = new Set(['.jpg', '.jpeg', '.png']);
+	function isImage(n: string): boolean {
+		const i = n.lastIndexOf('.');
+		if (i <= 0) return false;
+		return IMG_EXT.has(n.slice(i).toLowerCase());
+	}
 </script>
 
 <header>
@@ -34,7 +41,7 @@
 				<div>📁</div>
 				<a href={resolve('/files/[...path]', { path: file.path })}>{file.name}</a>
 			</div>
-		{:else if file.isImage}
+		{:else if isImage(file.name)}
 			<div class="file">
 				<img src={file.thumbnailPath} alt={file.name} loading="lazy" />
 				<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
