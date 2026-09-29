@@ -4,13 +4,12 @@ import { error } from '@sveltejs/kit';
 import {
 	blockNotDirectory,
 	getRelativePath,
-	isImage,
 	normalizePath,
 	resolvePath
-} from '$lib/utils.js';
+} from '$lib/server/utils.js';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const target = await resolvePath(params.path);
 	await blockNotDirectory(target);
 
@@ -30,19 +29,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		} catch {
 			continue;
 		}
-
-		const entryRelativePath = getRelativePath(target, entry.name);
 		files.push({
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
-			path: entryRelativePath,
 			size: entry.isDirectory() ? null : entryStat.size,
-			modified: entryStat.mtimeMs,
-			viewPath: `${url.origin}/view/${entryRelativePath}`,
-			thumbnailPath:
-				entry.isFile() && isImage(entry.name)
-					? `${url.origin}/thumbnail/${entryRelativePath}`
-					: null
+			path: getRelativePath(target, entry.name),
+			modified: entryStat.mtimeMs
 		});
 	}
 

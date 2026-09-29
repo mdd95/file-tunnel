@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
-import { resolvePath } from '$lib/utils.js';
+import { resolvePath } from '$lib/server/utils.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {

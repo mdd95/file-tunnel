@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { isImage } from '$lib/utils.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -7,13 +8,6 @@
 	$effect(() => {
 		console.log(data);
 	});
-
-	const IMG_EXT = new Set(['.jpg', '.jpeg', '.png']);
-	function isImage(n: string): boolean {
-		const i = n.lastIndexOf('.');
-		if (i <= 0) return false;
-		return IMG_EXT.has(n.slice(i).toLowerCase());
-	}
 </script>
 
 <header>
@@ -43,7 +37,7 @@
 			</div>
 		{:else if isImage(file.name)}
 			<div class="file">
-				<img src={file.thumbnailPath} alt={file.name} loading="lazy" />
+				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
 				<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
 			</div>
 		{:else if file.type === 'file'}

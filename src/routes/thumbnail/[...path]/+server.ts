@@ -5,7 +5,8 @@ import { Readable } from 'node:stream';
 import sharp from 'sharp';
 import { error } from '@sveltejs/kit';
 import { THUMBNAIL_DIR } from '$env/static/private';
-import { getThumbnailPath, isImage, resolvePath } from '$lib/utils.js';
+import { getThumbnailPath, resolvePath } from '$lib/server/utils.js';
+import { isImage } from '$lib/utils.js';
 import type { RequestHandler } from './$types';
 
 const THUMBNAIL_SIZE = 400;
