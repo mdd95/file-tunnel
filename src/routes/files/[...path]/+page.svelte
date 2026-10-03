@@ -1,4 +1,6 @@
 <script lang="ts">
+	import FileIcon from '@iconify-svelte/flat-color-icons/file';
+	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
 	import { resolve } from '$app/paths';
 	import { isImage } from '$lib/utils.js';
 	import type { PageProps } from './$types';
@@ -32,7 +34,9 @@
 	{#each data.files as file (file.name)}
 		{#if file.type === 'directory'}
 			<div class="file">
-				<div>📁</div>
+				<div>
+					<FolderIcon height="2em" />
+				</div>
 				<a href={resolve('/files/[...path]', { path: file.path })}>{file.name}</a>
 			</div>
 		{:else if isImage(file.name)}
@@ -42,7 +46,9 @@
 			</div>
 		{:else if file.type === 'file'}
 			<div class="file">
-				<div></div>
+				<div>
+					<FileIcon height="2em" />
+				</div>
 				<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
 			</div>
 		{/if}

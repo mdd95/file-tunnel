@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@iconify-svelte/flat-color-icons':
+        specifier: gitlab:iconify-icons/svelte#flat-color-icons
+        version: https://gitlab.com/iconify-icons/svelte/-/archive/0070be7491fc7fd53464c6696b8376fcefe4b086/svelte-0070be7491fc7fd53464c6696b8376fcefe4b086.tar.gz(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       mime-types:
         specifier: ^3.0.2
         version: 3.0.2
@@ -136,6 +139,18 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@iconify-svelte/flat-color-icons@https://gitlab.com/iconify-icons/svelte/-/archive/0070be7491fc7fd53464c6696b8376fcefe4b086/svelte-0070be7491fc7fd53464c6696b8376fcefe4b086.tar.gz':
+    resolution: {gitHosted: true, integrity: sha512-pvbZhpTWusdhPZgIqFXqmejCB9qwT00CJYzD1ZNDu/1PwtCEErU5ayUr8OcwtlkwxZzL7y/y3FsFKRSaHWrRqg==, tarball: https://gitlab.com/iconify-icons/svelte/-/archive/0070be7491fc7fd53464c6696b8376fcefe4b086/svelte-0070be7491fc7fd53464c6696b8376fcefe4b086.tar.gz}
+    version: 1.0.0
+
+  '@iconify/css-svelte@1.0.1':
+    resolution: {integrity: sha512-f9w1anXXBm48VjDEWDrGTybdiwnDTIChcUpBK/UtXR/AhNp/Co/VPp00t7dO93j+4Je0OwMKyc/HvI7Lpv3PKg==}
+    peerDependencies:
+      svelte: '>4.0.0'
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
@@ -1505,6 +1520,19 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@iconify-svelte/flat-color-icons@https://gitlab.com/iconify-icons/svelte/-/archive/0070be7491fc7fd53464c6696b8376fcefe4b086/svelte-0070be7491fc7fd53464c6696b8376fcefe4b086.tar.gz(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
+    dependencies:
+      '@iconify/css-svelte': 1.0.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+    transitivePeerDependencies:
+      - svelte
+
+  '@iconify/css-svelte@1.0.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
+    dependencies:
+      '@iconify/types': 2.0.0
+      svelte: 5.57.1(@typescript-eslint/types@8.70.1)
+
+  '@iconify/types@2.0.0': {}
 
   '@img/colour@1.1.0': {}
 
