@@ -5,59 +5,62 @@ import { Readable } from 'node:stream';
 import sharp from 'sharp';
 import { error } from '@sveltejs/kit';
 import { THUMBNAIL_DIR } from '$env/static/private';
-import { getThumbnailPath, resolvePath } from '$lib/server/utils.js';
+import { getPreviewPath, normalizePath, resolvePath } from '$lib/server/utils.js';
 import { isImage } from '$lib/utils.js';
 import type { RequestHandler } from './$types';
-
-const THUMBNAIL_SIZE = 400;
-const THUMBNAIL_QUALITY = 78;
 
 fs.mkdir(THUMBNAIL_DIR, { recursive: true });
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const origPath = await resolvePath(params.path);
-	const origStat = await fs.stat(origPath);
-	if (!origStat.isFile()) error(404, 'File not found');
-	if (!isImage(origPath)) error(400, 'Not an image');
+	const reqPath = await resolvePath(params.path);
 
-	const thumbnailPath = getThumbnailPath(params.path);
-
+	let reqStat;
 	try {
-		const thumbnailStat = await fs.stat(thumbnailPath);
-
-		if (thumbnailStat.mtimeMs >= origStat.mtimeMs) {
-			void 0;
-		}
-
-		const stream = createReadStream(thumbnailPath);
-
-		setHeaders({
-			'Content-Type': mime.lookup(origPath) || 'application/octet-stream',
-			'Content-Length': String(thumbnailStat.size),
-			'Cache-Control': 'private, max-age=3600'
-		});
-
-		return new Response(Readable.toWeb(stream) as ReadableStream);
+		reqStat = await fs.stat(reqPath);
 	} catch {
-		await sharp(origPath)
-			.rotate()
-			.resize(THUMBNAIL_SIZE, THUMBNAIL_SIZE, {
-				fit: 'cover',
-				position: 'centre',
-				withoutEnlargement: true
-			})
-			.jpeg({ quality: THUMBNAIL_QUALITY, mozjpeg: true })
-			.toFile(thumbnailPath);
-
-		const thumbnailStat = await fs.stat(thumbnailPath);
-		const stream = createReadStream(thumbnailPath);
-
-		setHeaders({
-			'Content-Type': mime.lookup(origPath) || 'application/octet-stream',
-			'Content-Length': String(thumbnailStat.size),
-			'Cache-Control': 'private, max-age=3600'
-		});
-
-		return new Response(Readable.toWeb(stream) as ReadableStream);
+		error(404, `File not found: "${normalizePath(params.path)}"`);
 	}
+
+	if (!reqStat.isFile()) {
+		error(404, `File not found: "${normalizePath(params.path)}"`);
+	}
+
+	if (!isImage(reqPath)) {
+		error(400, `Invalid file type: "${normalizePath(params.path)}"`);
+	}
+
+	const previewPath = getPreviewPath(params.path, 'avif');
+
+	let previewStat;
+	try {
+		previewStat = await fs.stat(previewPath);
+	} catch {
+		await createPreview(reqPath, previewPath);
+		previewStat = await fs.stat(previewPath);
+	}
+
+	if (previewStat.mtimeMs < reqStat.mtimeMs) {
+		await createPreview(reqPath, previewPath);
+	}
+
+	setHeaders({
+		'Content-Type': mime.lookup(reqPath) || 'application/octet-stream',
+		'Content-Length': String(previewStat.size),
+		'Cache-Control': 'private, max-age=3600'
+	});
+
+	const stream = createReadStream(previewPath);
+	return new Response(Readable.toWeb(stream) as ReadableStream);
 };
+
+async function createPreview(reqPath: string, previewPath: string) {
+	await sharp(reqPath)
+		.rotate()
+		.resize(256, 256, {
+			fit: 'cover',
+			position: 'centre',
+			withoutEnlargement: true
+		})
+		.toFormat('avif', { quality: 48 })
+		.toFile(previewPath);
+}

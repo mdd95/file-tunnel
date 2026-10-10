@@ -36,10 +36,15 @@ export async function blockNotDirectory(dirPath: string): Promise<Stats> {
 
 export function getRelativePath(directory: string, fileName: string): string {
 	const relative = path.relative(ROOT_DIR, path.join(directory, fileName));
-	return relative.split(path.sep).join('/');
+	return relative.split(path.sep).map(encodeURIComponent).join('/');
 }
 
 export function getThumbnailPath(relativePath: string): string {
 	const hash = crypto.createHash('sha256').update(relativePath).digest('hex');
 	return path.join(THUMBNAIL_DIR, `${hash}.jpg`);
+}
+
+export function getPreviewPath(reqPath: string, format: string): string {
+	const hash = crypto.createHash('sha256').update(reqPath).digest('hex');
+	return path.join(THUMBNAIL_DIR, `${hash}.${format}`);
 }
