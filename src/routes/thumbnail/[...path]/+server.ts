@@ -5,7 +5,7 @@ import { Readable } from 'node:stream';
 import sharp from 'sharp';
 import { error } from '@sveltejs/kit';
 import { THUMBNAIL_DIR } from '$env/static/private';
-import { getPreviewPath, normalizePath, resolvePath } from '$lib/server/utils.js';
+import { getPreviewPath, resolvePath } from '$lib/server/utils.js';
 import { isImage } from '$lib/utils.js';
 import type { RequestHandler } from './$types';
 
@@ -18,15 +18,15 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	try {
 		reqStat = await fs.stat(reqPath);
 	} catch {
-		error(404, `File not found: "${normalizePath(params.path)}"`);
+		error(404, 'Not found');
 	}
 
 	if (!reqStat.isFile()) {
-		error(404, `File not found: "${normalizePath(params.path)}"`);
+		error(404, 'Not a file');
 	}
 
 	if (!isImage(reqPath)) {
-		error(400, `Invalid file type: "${normalizePath(params.path)}"`);
+		error(400, 'Not an image file');
 	}
 
 	const previewPath = getPreviewPath(params.path, 'avif');

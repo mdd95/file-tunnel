@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
-import { normalizePath, resolvePath } from '$lib/server/utils.js';
+import { resolvePath } from '$lib/server/utils.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
@@ -13,11 +13,11 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	try {
 		stat = await fs.stat(reqPath);
 	} catch {
-		error(404, `File not found: "${normalizePath(params.path)}"`);
+		error(404, 'Not found');
 	}
 
 	if (!stat.isFile()) {
-		error(400, `Invalid file: "${normalizePath(params.path)}"`);
+		error(400, 'Not a file');
 	}
 
 	setHeaders({
