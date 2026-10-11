@@ -19,9 +19,8 @@ export async function resolvePath(reqPath: string): Promise<string> {
 	return target;
 }
 
-export function getRelativePath(directory: string, fileName: string): string {
-	const relative = path.relative(ROOT_DIR, path.join(directory, fileName));
-	return relative.split(path.sep).map(encodeURIComponent).join('/');
+export function getRelUrl(directory: string, fileName: string): string {
+	return path.relative(ROOT_DIR, path.join(directory, fileName)).split(path.sep).join('/');
 }
 
 export function getPreviewPath(reqPath: string, format: string): string {

@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { getRelativePath, resolvePath } from '$lib/server/utils.js';
+import { getRelUrl, resolvePath } from '$lib/server/utils.js';
 import { normalizeUrl } from '$lib/utils.js';
 import type { PageServerLoad } from './$types';
 
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
 			size: entry.isDirectory() ? null : stat.size,
-			path: getRelativePath(target, entry.name),
+			path: getRelUrl(target, entry.name),
 			modified: stat.mtimeMs
 		});
 	}
