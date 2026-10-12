@@ -1,6 +1,11 @@
 <script lang="ts">
 	import FileIcon from '@iconify-svelte/flat-color-icons/file';
 	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
+	import GridIcon from '@lucide/svelte/icons/grid-2x2';
+	import ListIcon from '@lucide/svelte/icons/list';
+	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
+	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 	import { resolve } from '$app/paths';
 	import { isImage } from '$lib/utils.js';
 	import type { PageProps } from './$types';
@@ -12,24 +17,28 @@
 	});
 </script>
 
-<header>
+<div class="toolbar">
 	<div>
-		<button class="btn btn-icon" onclick={() => window.history.back()}>&LeftArrow;</button>
-		<button class="btn btn-icon" onclick={() => window.history.forward()}>&RightArrow;</button>
+		<button class="btn btn-icon" onclick={() => window.history.back()}>
+			<ArrowLeftIcon size={20} />
+		</button>
+		<button class="btn btn-icon" onclick={() => window.history.forward()}>
+			<ArrowRightIcon size={20} />
+		</button>
 		<a href={resolve('/files/[...path]', { path: data.parentPath })} class="btn btn-icon">
-			&UpArrow;
+			<FolderUpIcon size={20} />
 		</a>
 	</div>
-	<div class="location">
-		<button class="btn">Home</button>
-	</div>
 	<div>
-		<button class="btn btn-icon">▦</button>
-		<button class="btn btn-icon">▦</button>
-		<button class="btn btn-icon">☷</button>
-		<button class="btn btn-icon">☰</button>
+		<button class="btn btn-icon">
+			<GridIcon size={20} />
+		</button>
+		<button class="btn btn-icon">
+			<ListIcon size={20} />
+		</button>
 	</div>
-</header>
+</div>
+
 <main>
 	{#each data.files as file (file.name)}
 		{#if file.type === 'directory'}
@@ -56,41 +65,17 @@
 </main>
 
 <style>
-	header {
+	.toolbar {
 		height: 4rem;
 		padding: 0 1rem;
 		display: flex;
-		gap: 0.5rem;
+		justify-content: space-between;
 		border-bottom: 1px solid rgb(0 0 0 / 0.2);
 
 		& > * {
 			display: flex;
 			align-items: center;
 		}
-
-		& .location {
-			flex-grow: 1;
-		}
-	}
-
-	.btn {
-		height: 2rem;
-		padding: 0 0.5rem;
-		display: grid;
-		place-items: center;
-		border-radius: var(--radius-md);
-		background-color: transparent;
-
-		@media (hover: hover) {
-			&:hover {
-				background-color: rgb(0 0 0 / 0.1);
-			}
-		}
-	}
-
-	.btn-icon {
-		width: 2rem;
-		height: 2rem;
 	}
 
 	main {
