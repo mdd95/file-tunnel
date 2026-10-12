@@ -23,6 +23,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	} catch {
 		error(400, 'Error reading directory');
 	}
+
 	const files = [];
 
 	for (const entry of entries) {
@@ -51,8 +52,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		});
 	});
 
+	const url = normalizeUrl(params.path);
 	return {
-		parentPath: normalizeUrl(params.path).split('/').slice(0, -1).join('/'),
+		url,
+		parentUrl: url.split('/').slice(0, -1).join('/'),
+		name: url.split('/').slice(-1)[0],
 		files
 	};
 };

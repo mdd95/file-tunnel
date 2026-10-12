@@ -17,6 +17,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{data.name}</title>
+</svelte:head>
+
 <div class="toolbar">
 	<div>
 		<button class="btn btn-icon" onclick={() => window.history.back()}>
@@ -25,7 +29,7 @@
 		<button class="btn btn-icon" onclick={() => window.history.forward()}>
 			<ArrowRightIcon size={20} />
 		</button>
-		<a href={resolve('/files/[...path]', { path: data.parentPath })} class="btn btn-icon">
+		<a href={resolve('/files/[...path]', { path: data.parentUrl })} class="btn btn-icon">
 			<FolderUpIcon size={20} />
 		</a>
 	</div>
