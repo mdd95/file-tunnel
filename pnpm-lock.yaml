@@ -11,6 +11,9 @@ importers:
       '@iconify-svelte/flat-color-icons':
         specifier: gitlab:iconify-icons/svelte#flat-color-icons
         version: https://gitlab.com/iconify-icons/svelte/-/archive/0070be7491fc7fd53464c6696b8376fcefe4b086/svelte-0070be7491fc7fd53464c6696b8376fcefe4b086.tar.gz(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+      '@lucide/svelte':
+        specifier: ^1.55.0
+        version: 1.55.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       mime-types:
         specifier: ^3.0.2
         version: 3.0.2
@@ -338,6 +341,11 @@ packages:
 
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
+
+  '@lucide/svelte@1.55.0':
+    resolution: {integrity: sha512-CTxJ3qbkDK2oCW1VJYKhqAUfOongRJqc9YWmJZn8E06QpCU7i5yAnUny4h/zMNy/iYpMtGiJDRSb6AVIornuXg==}
+    peerDependencies:
+      svelte: ^5
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -1666,6 +1674,10 @@ snapshots:
       keyv: 5.6.0
 
   '@keyv/serialize@1.1.1': {}
+
+  '@lucide/svelte@1.55.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
+    dependencies:
+      svelte: 5.57.1(@typescript-eslint/types@8.70.1)
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
