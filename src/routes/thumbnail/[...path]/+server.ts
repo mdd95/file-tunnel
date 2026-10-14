@@ -61,6 +61,6 @@ async function createPreview(reqPath: string, previewPath: string) {
 			position: 'centre',
 			withoutEnlargement: true
 		})
-		.toFormat('avif', { quality: 48 })
+		.toFormat('avif', { quality: 24 })
 		.toFile(previewPath);
 }

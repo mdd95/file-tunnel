@@ -18,7 +18,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.name}</title>
+	<title>{data.name || 'Files'}</title>
 </svelte:head>
 
 <div class="toolbar">
@@ -57,9 +57,7 @@
 			</a>
 		{:else if file.type === 'file'}
 			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
-				<div>
-					<FileIcon height="2em" />
-				</div>
+				<FileIcon height="2em" />
 				<span>{file.name}</span>
 			</a>
 		{/if}
