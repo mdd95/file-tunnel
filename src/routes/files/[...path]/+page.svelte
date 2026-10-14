@@ -46,35 +46,36 @@
 <main>
 	{#each data.files as file (file.name)}
 		{#if file.type === 'directory'}
-			<div class="file">
-				<div>
-					<FolderIcon height="2em" />
-				</div>
-				<a href={resolve('/files/[...path]', { path: file.path })}>{file.name}</a>
-			</div>
+			<a href={resolve('/files/[...path]', { path: file.path })} class="file">
+				<FolderIcon height="2em" />
+				<span>{file.name}</span>
+			</a>
 		{:else if isImage(file.name)}
-			<div class="file">
+			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
 				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
-				<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
-			</div>
+				<span>{file.name}</span>
+			</a>
 		{:else if file.type === 'file'}
-			<div class="file">
+			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
 				<div>
 					<FileIcon height="2em" />
 				</div>
-				<a href={resolve('/view/[...path]', { path: file.path })}>{file.name}</a>
-			</div>
+				<span>{file.name}</span>
+			</a>
 		{/if}
 	{/each}
 </main>
 
 <style>
 	.toolbar {
+		position: sticky;
+		top: 0;
 		height: 4rem;
 		padding: 0 1rem;
 		display: flex;
 		justify-content: space-between;
 		border-bottom: 1px solid rgb(0 0 0 / 0.2);
+		background-color: #fff;
 
 		& > * {
 			display: flex;
@@ -91,7 +92,7 @@
 		height: 3.5rem;
 		padding: 0 2rem;
 		display: grid;
-		grid-template-columns: 3.5rem 1fr;
+		grid-template-columns: 2.5rem 1fr;
 		align-items: center;
 		gap: 1rem;
 
@@ -101,15 +102,15 @@
 			}
 		}
 
-		& a {
+		& span {
 			width: 100%;
 			overflow: hidden;
 			text-wrap: nowrap;
+			text-overflow: ellipsis;
 		}
 	}
 
 	img {
-		height: 3.5rem;
 		aspect-ratio: 1 / 1;
 	}
 </style>
