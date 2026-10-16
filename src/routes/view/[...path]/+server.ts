@@ -10,8 +10,6 @@ import { resolvePath } from '#lib/server/utils.js';
 import { COMPRESSED_DIR } from '$app/env/private';
 import type { RequestHandler } from './$types';
 
-fs.mkdir(COMPRESSED_DIR, { recursive: true });
-
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	const reqPath = await resolvePath(params.path);
 

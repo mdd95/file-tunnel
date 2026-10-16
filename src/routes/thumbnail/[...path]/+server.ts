@@ -4,12 +4,9 @@ import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import sharp from 'sharp';
 import { error } from '@sveltejs/kit';
-import { THUMBNAIL_DIR } from '$app/env/private';
 import { getPreviewPath, resolvePath } from '#lib/server/utils.js';
 import { isImage } from '#lib/utils.js';
 import type { RequestHandler } from './$types';
-
-fs.mkdir(THUMBNAIL_DIR, { recursive: true });
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	const reqPath = await resolvePath(params.path);
