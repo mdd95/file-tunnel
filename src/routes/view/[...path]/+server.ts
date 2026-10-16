@@ -6,8 +6,8 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
-import { resolvePath } from '$lib/server/utils.js';
-import { COMPRESSED_DIR } from '$env/static/private';
+import { resolvePath } from '#lib/server/utils.js';
+import { COMPRESSED_DIR } from '$app/env/private';
 import type { RequestHandler } from './$types';
 
 fs.mkdir(COMPRESSED_DIR, { recursive: true });

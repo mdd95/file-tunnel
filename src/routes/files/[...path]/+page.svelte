@@ -7,7 +7,7 @@
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 	import { resolve } from '$app/paths';
-	import { isImage } from '$lib/utils.js';
+	import { isImage } from '#lib/utils.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

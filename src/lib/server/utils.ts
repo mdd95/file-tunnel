@@ -2,8 +2,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { normalizeUrl } from '$lib/utils.js';
-import { ROOT_DIR, THUMBNAIL_DIR } from '$env/static/private';
+import { normalizeUrl } from '#lib/utils.js';
+import { ROOT_DIR, THUMBNAIL_DIR } from '$app/env/private';
 
 export async function resolvePath(reqPath: string): Promise<string> {
 	let root, target;
