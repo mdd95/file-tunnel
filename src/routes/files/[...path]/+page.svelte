@@ -8,9 +8,12 @@
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 	import { resolve } from '$app/paths';
 	import { isImage } from '#lib/utils.js';
+	import PreviewDialog, { type PreviewState } from './preview-dialog.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	let previewState = $state<PreviewState | null>(null);
 
 	$effect(() => {
 		console.log(data);
@@ -20,6 +23,8 @@
 <svelte:head>
 	<title>{data.name || 'Files'}</title>
 </svelte:head>
+
+<PreviewDialog data={{ length: data.files.length, files: data.files }} bind:state={previewState} />
 
 <div class="toolbar">
 	<div>
@@ -51,10 +56,15 @@
 				<span>{file.name}</span>
 			</a>
 		{:else if isImage(file.name)}
-			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
+			<button
+				command="show-modal"
+				commandfor="preview-dialog"
+				onclick={() => (previewState = { index: 1, url: `/view/${file.path}` })}
+				class="file"
+			>
 				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
 				<span>{file.name}</span>
-			</a>
+			</button>
 		{:else if file.type === 'file'}
 			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
 				<FileIcon height="2em" />
@@ -106,6 +116,11 @@
 			text-wrap: nowrap;
 			text-overflow: ellipsis;
 		}
+	}
+
+	button.file {
+		background-color: transparent;
+		text-align: start;
 	}
 
 	img {
