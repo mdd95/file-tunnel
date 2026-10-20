@@ -49,7 +49,7 @@
 		<div class="dialog-header"></div>
 		<div class="dialog-content">
 			{#if state}
-				<img src={state.url} alt="Preview" />
+				<img src={state.url} alt="Preview" loading="lazy" />
 			{/if}
 		</div>
 		{#if state}
@@ -63,7 +63,9 @@
 
 <style>
 	dialog {
-		--t-duration: 75ms;
+		--t-duration: 60ms;
+		width: min(90vw, 62.5rem);
+		height: min(90dvh, 52rem);
 		margin: auto;
 		padding: 1rem;
 		background-color: #f0f0f0;
@@ -108,6 +110,8 @@
 	.dialog {
 		display: flex;
 		flex-direction: column;
+		width: 100%;
+		height: 100%;
 	}
 
 	.dialog-header {
@@ -115,9 +119,19 @@
 	}
 
 	.dialog-content {
-		width: 100%;
-		aspect-ratio: 1 / 1;
+		flex: 1 1 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		overflow: hidden;
+
+		& img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			object-position: center;
+		}
 	}
 
 	.dialog-actions {
@@ -126,11 +140,5 @@
 		align-items: center;
 		justify-content: end;
 		gap: 0.5rem;
-	}
-
-	img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
 	}
 </style>
