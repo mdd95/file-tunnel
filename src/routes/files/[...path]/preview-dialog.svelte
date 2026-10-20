@@ -71,6 +71,7 @@
 		background-color: #f0f0f0;
 		border: 0;
 		border-radius: 1rem;
+		overscroll-behavior: contain;
 
 		opacity: 0;
 		transform: translateY(-10px);
@@ -93,6 +94,8 @@
 
 	dialog::backdrop {
 		background-color: transparent;
+		overscroll-behavior: contain;
+		overflow: hidden;
 		transition:
 			display var(--t-duration) allow-discrete,
 			overlay var(--t-duration) allow-discrete,
