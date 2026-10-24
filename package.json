@@ -1,14 +1,24 @@
 {
 	"name": "file-tunnel",
-	"private": true,
 	"version": "0.0.1",
+	"private": true,
 	"type": "module",
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
+	},
 	"scripts": {
 		"prepare": "vp config && svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "vp fmt --check . && vp lint .",
 		"format": "vp fmt . --write"
+	},
+	"dependencies": {
+		"@iconify-svelte/flat-color-icons": "gitlab:iconify-icons/svelte#flat-color-icons",
+		"@lucide/svelte": "^1.55.0",
+		"mime-types": "^3.0.2",
+		"sharp": "^0.35.4"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "^6.0.0",
@@ -23,16 +33,6 @@
 		"typescript": "^6.0.3",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
-	},
-	"dependencies": {
-		"@iconify-svelte/flat-color-icons": "gitlab:iconify-icons/svelte#flat-color-icons",
-		"@lucide/svelte": "^1.55.0",
-		"mime-types": "^3.0.2",
-		"sharp": "^0.35.4"
-	},
-	"imports": {
-		"#lib": "./src/lib/index.js",
-		"#lib/*": "./src/lib/*"
 	},
 	"devEngines": {
 		"packageManager": {

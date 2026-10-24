@@ -216,7 +216,7 @@ export default defineConfig({
 		singleQuote: true,
 		trailingComma: 'none',
 		printWidth: 100,
-		sortPackageJson: false,
+		sortPackageJson: true,
 		svelte: {},
 		associations: [
 			{
