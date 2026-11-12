@@ -10,7 +10,13 @@
 
 	type DirectoryData = {
 		length: number;
-		files: { name: string; type: string; size: number | null; path: string; modified: number }[];
+		files: {
+			name: string;
+			type: string;
+			size: number | null;
+			path: string;
+			modified: number;
+		}[];
 	};
 
 	type Props = {
