@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { error } from '@sveltejs/kit';
-import { getRelUrl, resolvePath } from '#lib/server/utils.js';
-import { normalizeUrl } from '#lib/utils.js';
+import { relativeUrl, resolvePath } from '#lib/server/utils.js';
+import { normalizePath } from '#lib/client/utils.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
 			size: entry.isDirectory() ? null : stat.size,
-			path: getRelUrl(target, entry.name),
+			path: relativeUrl(target, entry.name),
 			modified: stat.mtimeMs
 		});
 	}
@@ -52,7 +52,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		});
 	});
 
-	const url = normalizeUrl(params.path);
+	const url = normalizePath(params.path);
 	return {
 		url,
 		parentUrl: url.split('/').slice(0, -1).join('/'),

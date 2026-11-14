@@ -7,7 +7,7 @@ import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import { error } from '@sveltejs/kit';
 import { resolvePath } from '#lib/server/utils.js';
-import { COMPRESSED_DIR } from '$app/env/private';
+import { PREVIEW_DIR } from '$app/env/private';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 
 function getCompressedPath(reqPath: string, format: string) {
 	const hash = crypto.createHash('sha256').update(reqPath).digest('hex');
-	return path.join(COMPRESSED_DIR, `${hash}.${format}`);
+	return path.join(PREVIEW_DIR, `${hash}.${format}`);
 }
 
 async function createCompressed(reqPath: string, compressedPath: string) {

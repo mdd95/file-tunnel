@@ -4,8 +4,8 @@ import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import sharp from 'sharp';
 import { error } from '@sveltejs/kit';
-import { getPreviewPath, resolvePath } from '#lib/server/utils.js';
-import { isImage } from '#lib/utils.js';
+import { thumbnailPath, resolvePath } from '#lib/server/utils.js';
+import { isImage } from '#lib/client/utils.js';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 		error(400, 'Not an image file');
 	}
 
-	const previewPath = getPreviewPath(params.path, 'avif');
+	const previewPath = thumbnailPath(params.path, 'webp');
 
 	let previewStat;
 	try {
@@ -50,14 +50,14 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 	return new Response(Readable.toWeb(stream) as ReadableStream);
 };
 
-async function createPreview(reqPath: string, previewPath: string) {
-	await sharp(reqPath)
+async function createPreview(requestPath: string, outputPath: string) {
+	await sharp(requestPath)
 		.rotate()
-		.resize(256, 256, {
-			fit: 'cover',
-			position: 'centre',
+		.resize({
 			withoutEnlargement: true
 		})
-		.toFormat('avif', { quality: 24 })
-		.toFile(previewPath);
+		.webp({
+			quality: 75
+		})
+		.toFile(outputPath);
 }
