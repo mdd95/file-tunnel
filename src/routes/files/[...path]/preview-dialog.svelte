@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
-
 	import { isImage } from '#lib/client/utils.js';
 
 	type Props = {
@@ -34,28 +32,6 @@
 		current = imgs[nxt];
 	}
 
-	onMount(() => {
-		const controller = new AbortController();
-
-		window.addEventListener(
-			'keyup',
-			(e) => {
-				if (e.key === 'ArrowRight') {
-					e.preventDefault();
-					nav(1);
-				} else if (e.key === 'ArrowLeft') {
-					e.preventDefault();
-					nav(-1);
-				}
-			},
-			{ signal: controller.signal }
-		);
-
-		return () => {
-			controller.abort();
-		};
-	});
-
 	let tsx = 0;
 	let tex = 0;
 	const MAXDIST = 50;
@@ -79,7 +55,20 @@
 	<span>{files[i].name}</span>
 </button>
 
-<dialog id="dialog-{cid}" closedby="any" class="dialog">
+<dialog
+	id="dialog-{cid}"
+	closedby="any"
+	class="dialog"
+	onkeydown={(e) => {
+		if (e.key === 'ArrowRight') {
+			e.preventDefault();
+			nav(1);
+		} else if (e.key === 'ArrowLeft') {
+			e.preventDefault();
+			nav(-1);
+		}
+	}}
+>
 	<div class="wrapper">
 		<div class="header">
 			<span>{files[current].name}</span>
