@@ -61,7 +61,9 @@
 		{#if state}
 			<div class="dialog-actions">
 				<a href={state.url} class="btn">View Original</a>
-				<button class="btn">Download</button>
+				<a href="/media/download/{state.url.slice(6)}" target="_blank" class="btn">
+					Download
+				</a>
 			</div>
 		{/if}
 	</div>

@@ -65,8 +65,11 @@
 				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
 				<span>{file.name}</span>
 			</button>
-		{:else if file.type === 'file'}
-			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
+		{:else}
+			<a
+				href={resolve('/media/[action]/[...path]', { action: 'download', path: file.path })}
+				class="file"
+			>
 				<FileIcon height="2em" />
 				<span>{file.name}</span>
 			</a>
