@@ -54,9 +54,13 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 			if (!isImage(rpath)) error(400, 'Not an image file');
 
 			const ppath = tmppath(PREVIEW_DIR, rpath);
-
 			await createPreview(rpath, ppath);
-			const pstat = await fs.stat(ppath);
+
+			let pstat = await fs.stat(ppath);
+			if (pstat.mtimeMs < stat.mtimeMs) {
+				await createPreview(rpath, ppath);
+				pstat = await fs.stat(ppath);
+			}
 
 			setHeaders({
 				'Content-Type': 'image/webp',
@@ -71,9 +75,13 @@ export const GET: RequestHandler = async ({ params, setHeaders }) => {
 			if (!isImage(rpath)) error(400, 'Not an image file');
 
 			const tpath = tmppath(THUMBNAIL_DIR, rpath);
-
 			await createThumbnail(rpath, tpath);
-			const tstat = await fs.stat(tpath);
+
+			let tstat = await fs.stat(tpath);
+			if (tstat.mtimeMs < stat.mtimeMs) {
+				await createThumbnail(rpath, tpath);
+				tstat = await fs.stat(tpath);
+			}
 
 			setHeaders({
 				'Content-Type': 'image/webp',

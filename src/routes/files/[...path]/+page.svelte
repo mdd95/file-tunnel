@@ -59,7 +59,7 @@
 			<button
 				command="show-modal"
 				commandfor="preview-dialog"
-				onclick={() => (previewState = { index: 1, url: `/view/${file.path}` })}
+				onclick={() => (previewState = { index: 1, url: `/media/preview/${file.path}` })}
 				class="file"
 			>
 				<img

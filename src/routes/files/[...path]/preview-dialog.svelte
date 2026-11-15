@@ -35,10 +35,10 @@
 				if (!state) return;
 				if (e.key === 'ArrowRight' && state.index < data.length) {
 					state.index += 1;
-					state.url = `/view/${data.files[state.index].path}`;
+					state.url = `/media/preview/${data.files[state.index].path}`;
 				} else if (e.key === 'ArrowLeft' && state.index > 0) {
 					state.index -= 1;
-					state.url = `/view/${data.files[state.index].path}`;
+					state.url = `/media/preview/${data.files[state.index].path}`;
 				}
 			},
 			{ signal: controller.signal }
