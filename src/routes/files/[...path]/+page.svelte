@@ -1,14 +1,19 @@
 <script lang="ts">
 	import FileIcon from '@iconify-svelte/flat-color-icons/file';
 	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
+
 	import GridIcon from '@lucide/svelte/icons/grid-2x2';
 	import ListIcon from '@lucide/svelte/icons/list';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
+
 	import { resolve } from '$app/paths';
-	import { isImage } from '#lib/client/utils.js';
+
+	import { formatSize, isImage } from '#lib/client/utils.js';
+
 	import PreviewDialog from './preview-dialog.svelte';
+
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -64,6 +69,7 @@
 			>
 				<FileIcon height="2em" />
 				<span>{file.name}</span>
+				<span class="file-size">{formatSize(file.size ?? 0)}</span>
 			</a>
 		{/if}
 	{/each}

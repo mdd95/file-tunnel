@@ -215,7 +215,7 @@
 		height: 3.5rem;
 		padding: 0 2rem;
 		display: grid;
-		grid-template-columns: 2.5rem 1fr;
+		grid-template-columns: 2.5rem 1fr 3rem;
 		align-items: center;
 		gap: 1rem;
 		text-align: start;
@@ -237,5 +237,11 @@
 			width: 2rem;
 			height: 2rem;
 		}
+	}
+
+	.file-size {
+		color: var(--color-muted-text);
+		font-size: 0.625rem;
+		text-align: end;
 	}
 }

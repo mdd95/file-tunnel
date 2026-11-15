@@ -1,6 +1,10 @@
 <script lang="ts">
+	import Download from '@lucide/svelte/icons/download';
+	import Image from '@lucide/svelte/icons/image';
+	import X from '@lucide/svelte/icons/x';
+
 	import { resolve } from '$app/paths';
-	import { isImage } from '#lib/client/utils.js';
+	import { formatSize, isImage } from '#lib/client/utils.js';
 
 	type Props = {
 		files: {
@@ -53,6 +57,7 @@
 		loading="lazy"
 	/>
 	<span>{files[i].name}</span>
+	<span class="file-size">{formatSize(files[i].size ?? 0)}</span>
 </button>
 
 <dialog
@@ -77,7 +82,7 @@
 				commandfor="dialog-{cid}"
 				class="btn btn-icon btn-secondary"
 			>
-				&times;
+				<X />
 			</button>
 		</div>
 
@@ -109,6 +114,7 @@
 				})}
 				class="btn btn-secondary"
 			>
+				<Image />
 				View Original
 			</a>
 			<a
@@ -119,6 +125,7 @@
 				target="_blank"
 				class="btn btn-secondary"
 			>
+				<Download />
 				Download
 			</a>
 		</div>
