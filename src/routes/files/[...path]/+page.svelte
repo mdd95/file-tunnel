@@ -62,12 +62,23 @@
 				onclick={() => (previewState = { index: 1, url: `/view/${file.path}` })}
 				class="file"
 			>
-				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
+				<img
+					src={resolve('/media/[action]/[...path]', {
+						action: 'thumbnail',
+						path: file.path
+					})}
+					alt={file.name}
+					loading="lazy"
+				/>
 				<span>{file.name}</span>
 			</button>
 		{:else}
 			<a
-				href={resolve('/media/[action]/[...path]', { action: 'download', path: file.path })}
+				href={resolve('/media/[action]/[...path]', {
+					action: 'download',
+					path: file.path
+				})}
+				target="_blank"
 				class="file"
 			>
 				<FileIcon height="2em" />

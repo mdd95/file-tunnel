@@ -1,94 +1,120 @@
 import { error } from '@sveltejs/kit';
-import mime from 'mime-types';
+
+import crypto from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import { Readable } from 'node:stream';
 import path from 'path';
+
+import mime from 'mime-types';
 import sharp from 'sharp';
+
+import { PREVIEW_DIR, THUMBNAIL_DIR } from '$app/env/private';
+
 import { isImage } from '#lib/client/utils.js';
-import { resolvePath, thumbnailPath } from '#lib/server/utils.js';
+import { resolvePath } from '#lib/server/utils.js';
+
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, setHeaders }) => {
-	const requestPath = await resolvePath(params.path);
-	const stat = await fs.stat(requestPath);
+	const rpath = await resolvePath(params.path);
+	const stat = await fs.stat(rpath);
 
 	if (!stat.isFile()) error(404, 'File not found');
 
-	const filename = path.basename(requestPath);
+	const filename = path.basename(rpath);
+	const mimetype = mime.lookup(filename) || 'application/octet-stream';
 
 	switch (params.action) {
 		case 'download': {
 			setHeaders({
 				'Content-Type': 'application/octet-stream',
-				'Content-Length': String(stat.size),
+				'Content-Length': `${stat.size}`,
 				'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`,
 				'Cache-Control': 'private, no-cache'
 			});
 
-			return streamFile(requestPath);
+			return streamFile(rpath);
 		}
 
 		case 'raw': {
-			if (!isImage(requestPath)) error(400, 'Not an image file');
+			if (!isImage(rpath)) error(400, 'Not an image file');
 
 			setHeaders({
-				'Content-Type': mime.lookup(filename) || 'application/octet-stream',
-				'Content-Length': String(stat.size),
+				'Content-Type': mimetype,
+				'Content-Length': `${stat.size}`,
 				'Content-Disposition': `inline; filename*=UTF-8''${encodeURIComponent(filename)}`,
 				'Cache-Control': 'private, max-age=3600'
 			});
 
-			return streamFile(requestPath);
+			return streamFile(rpath);
 		}
 
 		case 'preview': {
-			if (!isImage(requestPath)) error(400, 'Not an image file');
+			if (!isImage(rpath)) error(400, 'Not an image file');
+
+			const ppath = tmppath(PREVIEW_DIR, rpath);
+
+			await createPreview(rpath, ppath);
+			const pstat = await fs.stat(ppath);
 
 			setHeaders({
-				'Content-Type': mime.lookup(filename) || 'application/octet-stream',
-				'Content-Length': String(stat.size),
+				'Content-Type': 'image/webp',
+				'Content-Length': `${pstat.size}`,
 				'Content-Disposition': 'inline',
 				'Cache-Control': 'private, max-age=3600'
 			});
 
-			return streamFile(requestPath);
+			return streamFile(ppath);
 		}
 		case 'thumbnail': {
-			if (!isImage(requestPath)) error(400, 'Not an image file');
+			if (!isImage(rpath)) error(400, 'Not an image file');
 
-			const thumbnail = thumbnailPath(requestPath, 'webp');
-			await createThumbnail(requestPath, thumbnail);
+			const tpath = tmppath(THUMBNAIL_DIR, rpath);
+
+			await createThumbnail(rpath, tpath);
+			const tstat = await fs.stat(tpath);
 
 			setHeaders({
 				'Content-Type': 'image/webp',
-				'Content-Length': '',
+				'Content-Length': `${tstat.size}`,
+				'Content-Disposition': 'inline',
 				'Cache-Control': 'private, max-age=3600'
 			});
-			return streamFile(thumbnail);
+
+			return streamFile(tpath);
 		}
 		default:
 			error(400, 'Invalid action');
 	}
 };
 
-async function createThumbnail(requestPath: string, outputPath: string) {
+function tmppath(bpath: string, rpath: string) {
+	const hash = crypto.createHash('sha256').update(rpath).digest('hex');
+	return path.join(bpath, `${hash}.webp`);
+}
+
+async function createPreview(src: string, out: string) {
 	try {
-		await fs.access(outputPath);
+		await fs.access(out);
 	} catch {
-		await sharp(requestPath)
+		await sharp(src)
 			.rotate()
-			.resize({
-				width: 400,
-				height: 400,
-				fit: 'inside',
-				withoutEnlargement: true
-			})
-			.webp({
-				quality: 75,
-				effort: 4
-			})
-			.toFile(outputPath);
+			.resize({ width: 1920, fit: 'inside', withoutEnlargement: true })
+			.webp({ quality: 80, effort: 4 })
+			.toFile(out);
+	}
+}
+
+async function createThumbnail(src: string, out: string) {
+	try {
+		await fs.access(out);
+	} catch {
+		await sharp(src)
+			.rotate()
+			.resize({ width: 400, height: 400, fit: 'cover', withoutEnlargement: true })
+			.webp({ quality: 75, effort: 4 })
+			.toFile(out);
 	}
 }
 
