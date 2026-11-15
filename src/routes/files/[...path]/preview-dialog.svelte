@@ -55,6 +55,16 @@
 			controller.abort();
 		};
 	});
+
+	let tsx = 0;
+	let tex = 0;
+	const MAXDIST = 50;
+
+	function handleSwipe() {
+		const dist = tex - tsx;
+		if (Math.abs(dist) < MAXDIST) return;
+		nav(dist > 0 ? 1 : -1);
+	}
 </script>
 
 <button command="show-modal" commandfor="dialog-{cid}" class="btn btn-file">
@@ -82,7 +92,16 @@
 			</button>
 		</div>
 
-		<div class="content">
+		<div
+			role="button"
+			tabindex="0"
+			ontouchstart={(e) => (tsx = e.changedTouches[0].screenX)}
+			ontouchend={(e) => {
+				tex = e.changedTouches[0].screenX;
+				handleSwipe();
+			}}
+			class="content"
+		>
 			<img
 				src={resolve('/media/[action]/[...path]', {
 					action: 'preview',
