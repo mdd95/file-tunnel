@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 
+	import { isImage } from '#lib/client/utils.js';
+
 	type Props = {
 		files: {
 			name: string;
@@ -16,20 +18,35 @@
 	let { files, i }: Props = $props();
 	const cid = $props.id();
 
+	let current = $derived(i);
+
+	let imgs = $derived(
+		files.reduce<number[]>((a, file, j) => {
+			if (isImage(file.name)) a.push(j);
+			return a;
+		}, [])
+	);
+
+	function nav(d: 1 | -1) {
+		if (!imgs.length) return;
+		const pos = imgs.indexOf(current);
+		const nxt = (pos + d + imgs.length) % imgs.length;
+		current = imgs[nxt];
+	}
+
 	onMount(() => {
 		const controller = new AbortController();
 
 		window.addEventListener(
 			'keyup',
 			(e) => {
-				// if (!state) return;
-				// if (e.key === 'ArrowRight' && state.index < data.length) {
-				// 	state.index += 1;
-				// 	state.url = `/media/preview/${data.files[state.index].path}`;
-				// } else if (e.key === 'ArrowLeft' && state.index > 0) {
-				// 	state.index -= 1;
-				// 	state.url = `/media/preview/${data.files[state.index].path}`;
-				// }
+				if (e.key === 'ArrowRight') {
+					e.preventDefault();
+					nav(1);
+				} else if (e.key === 'ArrowLeft') {
+					e.preventDefault();
+					nav(-1);
+				}
 			},
 			{ signal: controller.signal }
 		);
@@ -55,7 +72,7 @@
 <dialog id="dialog-{cid}" closedby="any" class="dialog">
 	<div class="wrapper">
 		<div class="header">
-			<span>{files[i].name}</span>
+			<span>{files[current].name}</span>
 			<button
 				command="request-close"
 				commandfor="dialog-{cid}"
@@ -69,7 +86,7 @@
 			<img
 				src={resolve('/media/[action]/[...path]', {
 					action: 'preview',
-					path: files[i].path
+					path: files[current].path
 				})}
 				alt="Preview"
 				loading="lazy"
@@ -80,7 +97,7 @@
 			<a
 				href={resolve('/media/[action]/[...path]', {
 					action: 'raw',
-					path: files[i].path
+					path: files[current].path
 				})}
 				class="btn btn-secondary"
 			>
@@ -89,7 +106,7 @@
 			<a
 				href={resolve('/media/[action]/[...path]', {
 					action: 'download',
-					path: files[i].path
+					path: files[current].path
 				})}
 				target="_blank"
 				class="btn btn-secondary"
@@ -119,6 +136,11 @@
 			text-overflow: ellipsis;
 			overflow: hidden;
 		}
+	}
+
+	.content {
+		display: flex;
+		justify-content: center;
 	}
 
 	.actions {
