@@ -8,12 +8,10 @@
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 	import { resolve } from '$app/paths';
 	import { isImage } from '#lib/client/utils.js';
-	import PreviewDialog, { type PreviewState } from './preview-dialog.svelte';
+	import PreviewDialog from './preview-dialog.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-
-	let previewState = $state<PreviewState | null>(null);
 
 	$effect(() => {
 		console.log(data);
@@ -23,8 +21,6 @@
 <svelte:head>
 	<title>{data.name || 'Files'}</title>
 </svelte:head>
-
-<PreviewDialog data={{ length: data.files.length, files: data.files }} bind:state={previewState} />
 
 <div class="toolbar">
 	<div>
@@ -49,29 +45,14 @@
 </div>
 
 <main>
-	{#each data.files as file (file.name)}
+	{#each data.files as file, i (file.name)}
 		{#if file.type === 'directory'}
-			<a href={resolve('/files/[...path]', { path: file.path })} class="file">
+			<a href={resolve('/files/[...path]', { path: file.path })} class="btn btn-file">
 				<FolderIcon height="2em" />
 				<span>{file.name}</span>
 			</a>
 		{:else if isImage(file.name)}
-			<button
-				command="show-modal"
-				commandfor="preview-dialog"
-				onclick={() => (previewState = { index: 1, url: `/media/preview/${file.path}` })}
-				class="file"
-			>
-				<img
-					src={resolve('/media/[action]/[...path]', {
-						action: 'thumbnail',
-						path: file.path
-					})}
-					alt={file.name}
-					loading="lazy"
-				/>
-				<span>{file.name}</span>
-			</button>
+			<PreviewDialog files={data.files} {i} />
 		{:else}
 			<a
 				href={resolve('/media/[action]/[...path]', {
@@ -79,7 +60,7 @@
 					path: file.path
 				})}
 				target="_blank"
-				class="file"
+				class="btn btn-file"
 			>
 				<FileIcon height="2em" />
 				<span>{file.name}</span>
@@ -108,36 +89,5 @@
 	main {
 		display: flex;
 		flex-direction: column;
-	}
-
-	.file {
-		height: 3.5rem;
-		padding: 0 2rem;
-		display: grid;
-		grid-template-columns: 2.5rem 1fr;
-		align-items: center;
-		gap: 1rem;
-
-		@media (hover: hover) {
-			&:hover {
-				background-color: rgb(0 0 0 / 0.1);
-			}
-		}
-
-		& span {
-			width: 100%;
-			overflow: hidden;
-			text-wrap: nowrap;
-			text-overflow: ellipsis;
-		}
-	}
-
-	button.file {
-		background-color: transparent;
-		text-align: start;
-	}
-
-	img {
-		aspect-ratio: 1 / 1;
 	}
 </style>

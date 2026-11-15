@@ -1,5 +1,22 @@
+@layer base, utilities;
+
 :root {
-	--radius-md: 0.5rem;
+	color-scheme: light;
+
+	--color-base: light-dark(oklch(100% 0 0), oklch(8% 0 0));
+	--color-base-text: light-dark(oklch(24% 0 0), oklch(92% 0 0));
+	--color-primary: oklch(0.527 0.233 331.8);
+	--color-primary-text: oklch(0.98 0 0);
+	--color-secondary: light-dark(oklch(97% 0 0), oklch(32% 0 0));
+	--color-secondary-text: var(--color-base-text);
+	--color-muted: ;
+	--color-muted-text: light-dark(oklch(48% 0 0), oklch(58% 0 0));
+
+	--color-border: light-dark(oklch(92% 0 0), oklch(34% 0 0));
+	--color-outline: alpha(from var(--color-primary) / 0.75);
+	--color-dialog: light-dark(oklch(1 0 0), oklch(0.3 0 0));
+
+	--radius: 0;
 	--radius-full: calc(infinity * 1px);
 
 	--font-sans:
@@ -7,68 +24,218 @@
 		sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-*,
-::before,
-::after {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	border: 0 solid;
-}
+@layer base {
+	*,
+	::before,
+	::after,
+	::backdrop,
+	::file-selector-button {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		border: 0 solid;
+	}
 
-html {
-	font-family: var(--font-sans);
-	line-height: 1.5;
-	-webkit-text-size-adjust: 100%;
-	-webkit-tap-highlight-color: transparent;
-}
+	html {
+		font-family: var(--font-sans);
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: transparent;
+	}
 
-body {
-	min-height: 100vh;
-}
+	body {
+		min-height: 100vh;
+		background-color: var(--color-base);
+	}
 
-button,
-input,
-textarea,
-select {
-	font: inherit;
-	color: inherit;
-}
+	button,
+	input,
+	textarea,
+	select {
+		font: inherit;
+		color: inherit;
+	}
 
-img,
-svg,
-video,
-canvas {
-	display: block;
-	max-width: 100%;
-}
+	img,
+	svg,
+	video,
+	canvas {
+		display: block;
+		max-width: 100%;
+	}
 
-img,
-video {
-	height: auto;
-}
+	img,
+	video {
+		height: auto;
+	}
 
-a {
-	color: inherit;
-	text-decoration: none;
-}
-
-.btn {
-	height: 2.5rem;
-	padding: 0 0.5rem;
-	display: grid;
-	place-items: center;
-	border-radius: var(--radius-md);
-	background-color: transparent;
-
-	@media (hover: hover) {
-		&:hover {
-			background-color: rgb(0 0 0 / 0.1);
-		}
+	a {
+		color: inherit;
+		text-decoration: none;
 	}
 }
 
-.btn-icon {
-	width: 2.5rem;
-	height: 2.5rem;
+@layer utilities {
+	.btn {
+		--t-duration: 0.12s;
+		height: 2rem;
+		padding: 0 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.375rem;
+		background-color: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--radius);
+		outline: 2px solid transparent;
+		font-size: 0.875rem;
+		user-select: none;
+		cursor: pointer;
+
+		@media (prefers-reduced-motion: no-preference) {
+			transition:
+				background-color var(--t-duration) ease,
+				border-color var(--t-duration) ease,
+				color var(--t-duration) ease,
+				opacity var(--t-duration) ease;
+		}
+
+		& > svg {
+			width: 1rem;
+			height: 1rem;
+		}
+	}
+
+	.btn:disabled,
+	.btn[aria-disabled='true'] {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	.btn:focus-visible {
+		outline-color: var(--color-outline);
+		outline-offset: 2px;
+	}
+
+	.btn.btn-primary {
+		background-color: var(--color-primary);
+		color: var(--color-primary-text);
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: color-mix(in oklab, var(--color-primary) 90%, currentColor);
+			}
+		}
+	}
+
+	.btn.btn-secondary {
+		background-color: var(--color-secondary);
+		color: var(--color-secondary-text);
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: color-mix(in oklab, var(--color-secondary) 90%, currentColor);
+			}
+		}
+	}
+
+	@media (hover: hover) {
+		.btn.ghost:hover {
+			background-color: var(--color-secondary);
+		}
+	}
+
+	.btn.btn-icon {
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+	}
+
+	.dialog {
+		--t-duration: 0.12s;
+		--t-translate-x: 0;
+		--t-translate-y: -16px;
+		margin: auto;
+		max-height: 100dvh;
+		background-color: var(--color-dialog);
+		border-radius: var(--radius);
+		opacity: 0;
+		translate: var(--t-translate-x) var(--t-translate-y);
+		overscroll-behavior: contain;
+		scrollbar-width: thin;
+
+		@media (prefers-reduced-motion: no-preference) {
+			transition:
+				opacity var(--t-duration) ease,
+				translate var(--t-duration) ease,
+				display var(--t-duration) allow-discrete,
+				overlay var(--t-duration) allow-discrete;
+		}
+
+		&:open {
+			opacity: 1;
+			translate: 0 0;
+
+			@starting-style {
+				opacity: 0;
+				translate: var(--t-translate-x) var(--t-translate-y);
+			}
+		}
+	}
+
+	.dialog::backdrop {
+		background-color: transparent;
+		backdrop-filter: blur(1px);
+		overflow: hidden;
+		overscroll-behavior: contain;
+
+		@media (prefers-reduced-motion: no-preference) {
+			transition:
+				background-color var(--t-duration) ease,
+				display var(--t-duration) allow-discrete,
+				overlay var(--t-duration) allow-discrete;
+		}
+	}
+
+	.dialog:open::backdrop {
+		background-color: rgb(0 0 0 / 0.5);
+
+		@starting-style {
+			background-color: transparent;
+		}
+	}
+
+	.dialog.sidebar-left {
+		--t-translate-x: -16px;
+		--t-translate-y: 0;
+		margin-left: 0;
+		height: 100dvh;
+	}
+
+	.btn-file {
+		height: 3.5rem;
+		padding: 0 2rem;
+		display: grid;
+		grid-template-columns: 2.5rem 1fr;
+		align-items: center;
+		gap: 1rem;
+		text-align: start;
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: alpha(from var(--color-primary) / 0.1);
+			}
+		}
+
+		& span {
+			width: 100%;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+
+		& svg {
+			width: 2rem;
+			height: 2rem;
+		}
+	}
 }

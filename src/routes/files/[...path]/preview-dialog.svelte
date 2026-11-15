@@ -1,15 +1,8 @@
-<script lang="ts" module>
-	export type PreviewState = {
-		index: number;
-		url: string;
-	};
-</script>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 
-	type DirectoryData = {
-		length: number;
+	type Props = {
 		files: {
 			name: string;
 			type: string;
@@ -17,14 +10,11 @@
 			path: string;
 			modified: number;
 		}[];
+		i: number;
 	};
 
-	type Props = {
-		data: DirectoryData;
-		state: PreviewState | null;
-	};
-
-	let { data, state = $bindable() }: Props = $props();
+	let { files, i }: Props = $props();
+	const cid = $props.id();
 
 	onMount(() => {
 		const controller = new AbortController();
@@ -32,14 +22,14 @@
 		window.addEventListener(
 			'keyup',
 			(e) => {
-				if (!state) return;
-				if (e.key === 'ArrowRight' && state.index < data.length) {
-					state.index += 1;
-					state.url = `/media/preview/${data.files[state.index].path}`;
-				} else if (e.key === 'ArrowLeft' && state.index > 0) {
-					state.index -= 1;
-					state.url = `/media/preview/${data.files[state.index].path}`;
-				}
+				// if (!state) return;
+				// if (e.key === 'ArrowRight' && state.index < data.length) {
+				// 	state.index += 1;
+				// 	state.url = `/media/preview/${data.files[state.index].path}`;
+				// } else if (e.key === 'ArrowLeft' && state.index > 0) {
+				// 	state.index -= 1;
+				// 	state.url = `/media/preview/${data.files[state.index].path}`;
+				// }
 			},
 			{ signal: controller.signal }
 		);
@@ -50,106 +40,91 @@
 	});
 </script>
 
-<dialog id="preview-dialog" closedby="any" onclose={() => (state = null)}>
-	<div class="dialog">
-		<div class="dialog-header"></div>
-		<div class="dialog-content">
-			{#if state}
-				<img src={state.url} alt="Preview" loading="lazy" />
-			{/if}
+<button command="show-modal" commandfor="dialog-{cid}" class="btn btn-file">
+	<img
+		src={resolve('/media/[action]/[...path]', {
+			action: 'thumbnail',
+			path: files[i].path
+		})}
+		alt={files[i].name}
+		loading="lazy"
+	/>
+	<span>{files[i].name}</span>
+</button>
+
+<dialog id="dialog-{cid}" closedby="any" class="dialog">
+	<div class="wrapper">
+		<div class="header">
+			<span>{files[i].name}</span>
+			<button
+				command="request-close"
+				commandfor="dialog-{cid}"
+				class="btn btn-icon btn-secondary"
+			>
+				&times;
+			</button>
 		</div>
-		{#if state}
-			<div class="dialog-actions">
-				<a href={state.url} class="btn">View Original</a>
-				<a href="/media/download/{state.url.slice(6)}" target="_blank" class="btn">
-					Download
-				</a>
-			</div>
-		{/if}
+
+		<div class="content">
+			<img
+				src={resolve('/media/[action]/[...path]', {
+					action: 'preview',
+					path: files[i].path
+				})}
+				alt="Preview"
+				loading="lazy"
+			/>
+		</div>
+
+		<div class="actions">
+			<a
+				href={resolve('/media/[action]/[...path]', {
+					action: 'raw',
+					path: files[i].path
+				})}
+				class="btn btn-secondary"
+			>
+				View Original
+			</a>
+			<a
+				href={resolve('/media/[action]/[...path]', {
+					action: 'download',
+					path: files[i].path
+				})}
+				target="_blank"
+				class="btn btn-secondary"
+			>
+				Download
+			</a>
+		</div>
 	</div>
 </dialog>
 
 <style>
-	dialog {
-		--t-duration: 60ms;
-		width: min(90vw, 62.5rem);
-		height: min(90dvh, 52rem);
-		margin: auto;
-		padding: 1rem;
-		background-color: #f0f0f0;
-		border: 0;
-		border-radius: 1rem;
-		overscroll-behavior: contain;
-
-		opacity: 0;
-		transform: translateY(-10px);
-		transition:
-			opacity var(--t-duration) ease-out,
-			transform var(--t-duration) ease-out,
-			overlay var(--t-duration) ease-out allow-discrete,
-			display var(--t-duration) ease-out allow-discrete;
-	}
-
-	dialog:open {
-		opacity: 1;
-		transform: translateY(0);
-
-		@starting-style {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-	}
-
-	dialog::backdrop {
-		background-color: transparent;
-		overscroll-behavior: contain;
-		overflow: hidden;
-		transition:
-			display var(--t-duration) allow-discrete,
-			overlay var(--t-duration) allow-discrete,
-			background-color var(--t-duration);
-	}
-
-	dialog:open::backdrop {
-		background-color: rgb(0 0 0 / 0.25);
-
-		@starting-style {
-			background-color: transparent;
-		}
-	}
-
-	.dialog {
+	.wrapper {
 		display: flex;
 		flex-direction: column;
+	}
+
+	.header {
+		padding: 1rem;
 		width: 100%;
-		height: 100%;
-	}
-
-	.dialog-header {
-		height: 3.5rem;
-	}
-
-	.dialog-content {
-		flex: 1 1 auto;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		overflow: hidden;
+		justify-content: space-between;
 
-		& img {
-			display: block;
-			width: 100%;
-			height: 100%;
-			object-fit: contain;
-			object-position: center;
+		& span {
+			font-weight: bolder;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 	}
 
-	.dialog-actions {
-		height: 3.5rem;
+	.actions {
+		padding: 0.5rem;
 		display: flex;
-		align-items: center;
 		justify-content: end;
-		gap: 0.5rem;
+		gap: 0.25rem;
 	}
 </style>
