@@ -64,7 +64,7 @@
 <div class="breadcrumb">
 	<ol>
 		{#each bclinks as { label, url }}
-			<li><a href="/files/{url}">{label}</a></li>
+			<li><a href={resolve('/files/[...path]', { path: url })}>{label}</a></li>
 		{/each}
 	</ol>
 </div>
@@ -103,8 +103,8 @@
 		padding: 0 1rem;
 		display: flex;
 		justify-content: space-between;
-		border-bottom: 1px solid rgb(0 0 0 / 0.2);
-		background-color: #fff;
+		background-color: var(--color-base);
+		border-bottom: 1px solid var(--color-border);
 
 		& > * {
 			display: flex;

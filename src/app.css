@@ -1,8 +1,6 @@
 @layer base, utilities;
 
 :root {
-	color-scheme: light;
-
 	--color-base: light-dark(oklch(100% 0 0), oklch(8% 0 0));
 	--color-base-text: light-dark(oklch(24% 0 0), oklch(92% 0 0));
 	--color-primary: oklch(0.527 0.233 331.8);
