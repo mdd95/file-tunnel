@@ -55,6 +55,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const url = normalizePath(params.path);
 	return {
 		url,
+		path: params.path,
 		parentUrl: url.split('/').slice(0, -1).join('/'),
 		name: url.split('/').slice(-1)[0],
 		files

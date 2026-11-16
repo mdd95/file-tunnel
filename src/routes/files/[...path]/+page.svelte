@@ -18,8 +18,20 @@
 
 	let { data }: PageProps = $props();
 
-	$effect(() => {
-		console.log(data);
+	// const conv = (str: string) =>
+	// 	str.replace(/(^|-)([a-z])/g, (...a) => ` ${a[2].toUpperCase()}`).trim();
+
+	let bclinks = $derived.by(() => {
+		const arr = [{ label: 'ROOT', url: '' }];
+		let url = '';
+
+		for (const s of data.url.split('/')) {
+			if (!s) continue;
+
+			url += url ? `/${s}` : s;
+			arr.push({ label: s, url });
+		}
+		return arr;
 	});
 </script>
 
@@ -47,6 +59,14 @@
 			<ListIcon size={20} />
 		</button>
 	</div>
+</div>
+
+<div class="breadcrumb">
+	<ol>
+		{#each bclinks as { label, url }}
+			<li><a href="/files/{url}">{label}</a></li>
+		{/each}
+	</ol>
 </div>
 
 <main>
@@ -95,5 +115,21 @@
 	main {
 		display: flex;
 		flex-direction: column;
+	}
+
+	.breadcrumb {
+		padding: 1rem;
+	}
+
+	.breadcrumb ol {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		list-style: none;
+
+		& li:has(+ li):after {
+			content: '/';
+			margin-left: 0.5rem;
+		}
 	}
 </style>
