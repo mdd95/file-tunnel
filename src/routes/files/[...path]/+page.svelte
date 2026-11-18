@@ -92,6 +92,8 @@
 				<span class="file-size">{formatSize(file.size ?? 0)}</span>
 			</a>
 		{/if}
+	{:else}
+		<div class="empty">Empty folder</div>
 	{/each}
 </main>
 
@@ -131,5 +133,12 @@
 			content: '/';
 			margin-left: 0.5rem;
 		}
+	}
+
+	.empty {
+		height: 10rem;
+		display: grid;
+		place-items: center;
+		color: var(--color-muted-text);
 	}
 </style>
