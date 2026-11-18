@@ -1,17 +1,16 @@
 <script lang="ts">
+	import { Moon, Sun } from 'lucide';
+	import { MorphIcon } from 'morphicons/svelte';
+
 	import FileIcon from '@iconify-svelte/flat-color-icons/file';
 	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
-
-	import GridIcon from '@lucide/svelte/icons/grid-2x2';
-	import ListIcon from '@lucide/svelte/icons/list';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
 
 	import { resolve } from '$app/paths';
-
+	import { getmode, togglemode } from '#lib/client/theme-mode.svelte.js';
 	import { formatSize, isImage } from '#lib/client/utils.js';
-
 	import PreviewDialog from './preview-dialog.svelte';
 
 	import type { PageProps } from './$types';
@@ -44,19 +43,18 @@
 		<button class="btn btn-icon" onclick={() => window.history.back()}>
 			<ArrowLeftIcon size={20} />
 		</button>
+
 		<button class="btn btn-icon" onclick={() => window.history.forward()}>
 			<ArrowRightIcon size={20} />
 		</button>
+
 		<a href={resolve('/files/[...path]', { path: data.parentUrl })} class="btn btn-icon">
 			<FolderUpIcon size={20} />
 		</a>
 	</div>
 	<div>
-		<button class="btn btn-icon">
-			<GridIcon size={20} />
-		</button>
-		<button class="btn btn-icon">
-			<ListIcon size={20} />
+		<button onclick={() => togglemode()} class="btn btn-icon" aria-label="Toggle theme mode">
+			<MorphIcon icon={getmode() === 'dark' ? Moon : Sun} />
 		</button>
 	</div>
 </div>
