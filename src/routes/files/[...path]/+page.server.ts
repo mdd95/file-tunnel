@@ -33,6 +33,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		} catch {
 			continue;
 		}
+
+		if (entry.name.startsWith('.') || entry.name === 'Thumbs.db') continue;
+
 		files.push({
 			name: entry.name,
 			type: entry.isDirectory() ? 'directory' : 'file',
