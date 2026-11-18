@@ -1,30 +1,43 @@
 <script lang="ts">
 	import FileIcon from '@iconify-svelte/flat-color-icons/file';
 	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
+
 	import GridIcon from '@lucide/svelte/icons/grid-2x2';
 	import ListIcon from '@lucide/svelte/icons/list';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
+
 	import { resolve } from '$app/paths';
-	import { isImage } from '#lib/utils.js';
-	import PreviewDialog, { type PreviewState } from './preview-dialog.svelte';
+
+	import { formatSize, isImage } from '#lib/client/utils.js';
+
+	import PreviewDialog from './preview-dialog.svelte';
+
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
-	let previewState = $state<PreviewState | null>(null);
+	// const conv = (str: string) =>
+	// 	str.replace(/(^|-)([a-z])/g, (...a) => ` ${a[2].toUpperCase()}`).trim();
 
-	$effect(() => {
-		console.log(data);
+	let bclinks = $derived.by(() => {
+		const arr = [{ label: 'ROOT', url: '' }];
+		let url = '';
+
+		for (const s of data.url.split('/')) {
+			if (!s) continue;
+
+			url += url ? `/${s}` : s;
+			arr.push({ label: s, url });
+		}
+		return arr;
 	});
 </script>
 
 <svelte:head>
 	<title>{data.name || 'Files'}</title>
 </svelte:head>
-
-<PreviewDialog data={{ length: data.files.length, files: data.files }} bind:state={previewState} />
 
 <div class="toolbar">
 	<div>
@@ -48,27 +61,35 @@
 	</div>
 </div>
 
+<div class="breadcrumb">
+	<ol>
+		{#each bclinks as { label, url }}
+			<li><a href={resolve('/files/[...path]', { path: url })}>{label}</a></li>
+		{/each}
+	</ol>
+</div>
+
 <main>
-	{#each data.files as file (file.name)}
+	{#each data.files as file, i (file.name)}
 		{#if file.type === 'directory'}
-			<a href={resolve('/files/[...path]', { path: file.path })} class="file">
+			<a href={resolve('/files/[...path]', { path: file.path })} class="btn btn-file">
 				<FolderIcon height="2em" />
 				<span>{file.name}</span>
 			</a>
 		{:else if isImage(file.name)}
-			<button
-				command="show-modal"
-				commandfor="preview-dialog"
-				onclick={() => (previewState = { index: 1, url: `/view/${file.path}` })}
-				class="file"
+			<PreviewDialog files={data.files} {i} />
+		{:else}
+			<a
+				href={resolve('/media/[action]/[...path]', {
+					action: 'download',
+					path: file.path
+				})}
+				target="_blank"
+				class="btn btn-file"
 			>
-				<img src="/thumbnail/{file.path}" alt={file.name} loading="lazy" />
-				<span>{file.name}</span>
-			</button>
-		{:else if file.type === 'file'}
-			<a href={resolve('/view/[...path]', { path: file.path })} class="file">
 				<FileIcon height="2em" />
 				<span>{file.name}</span>
+				<span class="file-size">{formatSize(file.size ?? 0)}</span>
 			</a>
 		{/if}
 	{/each}
@@ -82,8 +103,8 @@
 		padding: 0 1rem;
 		display: flex;
 		justify-content: space-between;
-		border-bottom: 1px solid rgb(0 0 0 / 0.2);
-		background-color: #fff;
+		background-color: var(--color-base);
+		border-bottom: 1px solid var(--color-border);
 
 		& > * {
 			display: flex;
@@ -96,34 +117,19 @@
 		flex-direction: column;
 	}
 
-	.file {
-		height: 3.5rem;
-		padding: 0 2rem;
-		display: grid;
-		grid-template-columns: 2.5rem 1fr;
-		align-items: center;
-		gap: 1rem;
-
-		@media (hover: hover) {
-			&:hover {
-				background-color: rgb(0 0 0 / 0.1);
-			}
-		}
-
-		& span {
-			width: 100%;
-			overflow: hidden;
-			text-wrap: nowrap;
-			text-overflow: ellipsis;
-		}
+	.breadcrumb {
+		padding: 1rem;
 	}
 
-	button.file {
-		background-color: transparent;
-		text-align: start;
-	}
+	.breadcrumb ol {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		list-style: none;
 
-	img {
-		aspect-ratio: 1 / 1;
+		& li:has(+ li):after {
+			content: '/';
+			margin-left: 0.5rem;
+		}
 	}
 </style>
