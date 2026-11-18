@@ -155,7 +155,7 @@
 	}
 
 	.content {
-		max-height: calc(95lvh - 8rem);
+		max-height: calc(90dvh - 8rem);
 		display: flex;
 		justify-content: center;
 
