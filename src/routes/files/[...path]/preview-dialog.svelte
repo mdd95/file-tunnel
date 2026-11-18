@@ -139,7 +139,8 @@
 	}
 
 	.header {
-		padding: 1rem;
+		height: 4rem;
+		padding: 0 1rem;
 		width: 100%;
 		display: flex;
 		align-items: center;
@@ -154,12 +155,18 @@
 	}
 
 	.content {
+		max-height: calc(95lvh - 8rem);
 		display: flex;
 		justify-content: center;
+
+		& img {
+			object-fit: contain;
+			object-position: center;
+		}
 	}
 
 	.actions {
-		padding: 0.5rem;
+		padding: 1rem;
 		display: flex;
 		justify-content: end;
 		gap: 0.25rem;
