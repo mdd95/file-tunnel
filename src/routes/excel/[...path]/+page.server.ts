@@ -18,7 +18,10 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const sheetName = workbook.SheetNames[0];
 	const sheet = workbook.Sheets[sheetName];
-	const data = xlsx.utils.sheet_to_json<{ id: string }>(sheet, { defval: '', raw: true });
+	const data = xlsx.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+		defval: '',
+		raw: true
+	});
 
 	return {
 		rows: data
