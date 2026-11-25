@@ -9,6 +9,8 @@
 	import { formatDate } from '#lib/client/utils.js';
 	import { read } from '#lib/remote/excel.remote.js';
 
+	import Card from './card.svelte';
+
 	const primary = ['JO Number', 'Nature of Work', 'Address'];
 
 	type IData = Record<string, unknown>;
@@ -87,16 +89,7 @@
 				{/snippet}
 
 				{#snippet renderItem(item)}
-					<button
-						type="button"
-						class="item"
-						onclick={() => setSearchParam('item', item.refIndex)}
-					>
-						{#each Object.entries(pick(item.item, primary)) as [key, value]}
-							<div class="key">{key}</div>
-							<div class="value">{value}</div>
-						{/each}
-					</button>
+					<Card data={item.item} refIndex={item.refIndex} keys={primary} />
 				{/snippet}
 			</SvelteVirtualList>
 		</div>
