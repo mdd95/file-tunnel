@@ -19,3 +19,14 @@ export function formatSize(s: number) {
 export function normalizePath(path: string): string {
 	return path.replaceAll('\\', '/').replace(/^\/+/, '').replace(/\/+/g, '/');
 }
+
+export function formatDate(date: Date) {
+	const locale = new Intl.DateTimeFormat().resolvedOptions().locale;
+	const options: Intl.DateTimeFormatOptions = {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	};
+
+	return date.toLocaleDateString(locale, options);
+}

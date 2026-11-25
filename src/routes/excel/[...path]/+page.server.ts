@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	});
 
 	return {
+		sheetNames: workbook.SheetNames,
 		fileName,
 		rows: data
 	};
