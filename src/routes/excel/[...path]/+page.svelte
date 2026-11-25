@@ -1,5 +1,6 @@
 <script lang="ts">
 	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
+	import Fuse from 'fuse.js';
 	import type { PageServerData } from './$types';
 
 	type Props = {
@@ -7,54 +8,29 @@
 	};
 
 	let { data }: Props = $props();
-	const TOKEN = ['Address'];
 
-	const normalize = (str: string) =>
-		str
-			.toLowerCase()
-			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '')
-			.replace(/[^\p{L}\p{N}]+/gu, ' ')
-			.trim();
-
-	const tokenize = $derived(
-		data.rows.map((row) => {
-			const token = new Set<string>();
-
-			for (const key of TOKEN) {
-				if (typeof row[key] !== 'string') continue;
-
-				for (const word of normalize(row[key]).split(/\s+/)) {
-					if (word) token.add(word);
-				}
-			}
-
-			return { data: row, token };
-		})
-	);
+	const fuse = new Fuse(data.rows, {
+		keys: ['JO Number', 'Address'],
+		useTokenSearch: true,
+		tokenMatch: 'all',
+		includeScore: true
+	});
 
 	let inp = $state('');
-
-	let inputTokens = $derived(normalize(inp).split(/\s+/).filter(Boolean));
-
-	let fdata = $derived(
-		inputTokens.length
-			? tokenize.filter(({ token }) =>
-					inputTokens.every((input) => [...token].some((word) => word.startsWith(input)))
-				)
-			: tokenize
-	);
+	let filtered = $derived(fuse.search(inp));
 </script>
 
 <div class="wrapper">
-	<div class="toolbar">
-		<input type="text" bind:value={inp} />
-	</div>
+	<SvelteVirtualList items={filtered}>
+		{#snippet header()}
+			<div class="toolbar">
+				<input type="text" bind:value={inp} />
+			</div>
+		{/snippet}
 
-	<SvelteVirtualList items={fdata}>
 		{#snippet renderItem(item)}
 			<div class="item">
-				{#each Object.entries(item.data) as [key, value]}
+				{#each Object.entries(item.item) as [key, value]}
 					<div class="key">{key}</div>
 					<div class="value">{value}</div>
 				{/each}
