@@ -1,8 +1,10 @@
-import { error } from '@sveltejs/kit';
-import { ROOT, THUMBNAIL_DIR } from '$app/env/private';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
+import { ROOT, THUMBNAIL_DIR } from '$app/env/private';
+import { error } from '@sveltejs/kit';
+
 import { normalizePath } from '../client/utils.ts';
 
 export async function resolvePath(requestPath: string): Promise<string> {

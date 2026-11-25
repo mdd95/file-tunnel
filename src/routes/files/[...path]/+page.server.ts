@@ -1,8 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
 import { error } from '@sveltejs/kit';
-import { relativeUrl, resolvePath } from '#lib/server/utils.js';
+
 import { normalizePath } from '#lib/client/utils.js';
+import { relativeUrl, resolvePath } from '#lib/server/utils.js';
+
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {

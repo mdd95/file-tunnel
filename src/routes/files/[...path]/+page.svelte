@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { Moon, Sun } from 'lucide';
-	import { MorphIcon } from 'morphicons/svelte';
-
+	import { resolve } from '$app/paths';
 	import FileIcon from '@iconify-svelte/flat-color-icons/file';
 	import FolderIcon from '@iconify-svelte/flat-color-icons/folder';
 	import ArrowLeftIcon from '@lucide/svelte/icons/arrow-left';
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
+	import Download from '@lucide/svelte/icons/download';
+	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
 	import FolderUpIcon from '@lucide/svelte/icons/folder-up';
+	import X from '@lucide/svelte/icons/x';
+	import { Moon, Sun } from 'lucide';
+	import { MorphIcon } from 'morphicons/svelte';
 
-	import { resolve } from '$app/paths';
 	import { getmode, togglemode } from '#lib/client/theme-mode.svelte.js';
-	import { formatSize, isImage } from '#lib/client/utils.js';
-	import PreviewDialog from './preview-dialog.svelte';
+	import { formatSize, isExcel, isImage } from '#lib/client/utils.js';
 
 	import type { PageProps } from './$types';
+	import PreviewDialog from './preview-dialog.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -76,6 +78,48 @@
 			</a>
 		{:else if isImage(file.name)}
 			<PreviewDialog files={data.files} {i} />
+		{:else if isExcel(file.name)}
+			<button command="show-modal" commandfor="dialog-{i}" class="btn btn-file">
+				<FileIcon height="2em" />
+				<span>{file.name}</span>
+				<span class="file-size">{formatSize(file.size ?? 0)}</span>
+			</button>
+
+			<dialog id="dialog-{i}" closedby="any" class="dialog">
+				<div class="wrapper">
+					<div class="header">
+						<span>{file.name}</span>
+						<button
+							command="request-close"
+							commandfor="dialog-{i}"
+							class="btn btn-icon btn-secondary"
+						>
+							<X />
+						</button>
+					</div>
+
+					<div class="actions">
+						<a
+							href={resolve('/excel/[...path]', { path: file.path })}
+							class="btn btn-secondary"
+						>
+							<FileSpreadsheet />
+							View Excel
+						</a>
+						<a
+							href={resolve('/media/[action]/[...path]', {
+								action: 'download',
+								path: file.path
+							})}
+							target="_blank"
+							class="btn btn-secondary"
+						>
+							<Download />
+							Download
+						</a>
+					</div>
+				</div>
+			</dialog>
 		{:else}
 			<a
 				href={resolve('/media/[action]/[...path]', {
@@ -138,5 +182,30 @@
 		display: grid;
 		place-items: center;
 		color: var(--color-muted-text);
+	}
+
+	.dialog {
+		& .header {
+			height: 4rem;
+			padding: 0 1rem;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+
+			& span {
+				font-weight: bolder;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+			}
+		}
+
+		& .actions {
+			padding: 1rem;
+			display: flex;
+			justify-content: end;
+			gap: 0.25rem;
+		}
 	}
 </style>

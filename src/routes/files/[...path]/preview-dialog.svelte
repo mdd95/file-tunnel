@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import Download from '@lucide/svelte/icons/download';
 	import Image from '@lucide/svelte/icons/image';
 	import X from '@lucide/svelte/icons/x';
 
-	import { resolve } from '$app/paths';
 	import { formatSize, isImage } from '#lib/client/utils.js';
 
 	type Props = {

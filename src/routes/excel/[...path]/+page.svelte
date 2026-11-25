@@ -1,107 +1,116 @@
 <script lang="ts">
-	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
-	import Fuse from 'fuse.js';
-	import { Debounced } from 'runed';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
+	import Fuse, { type IFuseOptions } from 'fuse.js';
+	import { Debounced } from 'runed';
+
 	import { formatDate } from '#lib/client/utils.js';
-	import type { PageServerData } from './$types';
-
-	type Props = {
-		data: PageServerData;
-	};
-
-	let { data }: Props = $props();
+	import { read } from '#lib/remote/excel.remote.js';
 
 	const primary = ['JO Number', 'Nature of Work', 'Address'];
 
-	const fuse = $derived(
-		new Fuse(data.rows, {
-			keys: ['JO Number', 'Address'],
-			useTokenSearch: true,
-			tokenMatch: 'all',
-			includeScore: true
-		})
-	);
+	type IData = Record<string, unknown>;
+
+	const fuseOptions: IFuseOptions<IData> = {
+		keys: ['JO Number', 'Address'],
+		useTokenSearch: true,
+		tokenMatch: 'all',
+		includeScore: true
+	};
 
 	let searchInput = $state('');
 	const debounced = new Debounced(() => searchInput, 500);
-
-	const filtered = $derived(fuse.search(debounced.current));
 
 	function pick(obj: Record<string, unknown>, keys: string[]) {
 		return Object.fromEntries(keys.map((key) => [key, obj[key]]));
 	}
 
-	async function selectSheet(index: number) {
+	async function setSearchParam(key: string, value: number | string) {
 		const url = new URL(page.url.href);
-		url.searchParams.set('sheet', String(index));
+		url.searchParams.set(key, typeof value === 'string' ? value : String(value));
 
-		await goto(url);
-	}
-
-	async function selectItem(index: number) {
-		const url = new URL(page.url.href);
-		url.searchParams.set('index', String(index));
-
-		await goto(url);
+		await goto(resolve('/excel/[...path]', { path: `${page.params.path ?? ''}${url.search}` }));
 	}
 </script>
 
 <svelte:head>
-	<title>{data.fileName}</title>
+	{const p = page.params.path ?? ''}
+	{const q = p.lastIndexOf('/')}
+
+	<title>{p.slice(q + 1)}</title>
 </svelte:head>
 
-{#if page.url.searchParams.has('index')}
-	<div class="view">
-		<div class="item">
-			{#each Object.entries(data.rows[Number(page.url.searchParams.get('index'))]) as [key, value]}
-				<div class="key">{key}</div>
-				<div class="value">
-					{value instanceof Date ? formatDate(value) : value}
-				</div>
-			{/each}
-		</div>
-	</div>
-{:else}
-	<div class="wrapper">
-		<SvelteVirtualList items={filtered}>
-			{#snippet header()}
-				<div class="toolbar">
-					<select
-						onchange={(e) => selectSheet(Number((e.target as HTMLSelectElement).value))}
-					>
-						{#each data.sheetNames as sheetName, i}
-							<option value={i}>{sheetName}</option>
-						{/each}
-					</select>
-					<input
-						type="text"
-						bind:value={searchInput}
-						aria-label="Search item"
-						placeholder="Search {['JO Number', 'Address'].join(', ')}"
-					/>
-				</div>
-			{/snippet}
+<svelte:boundary>
+	{const sheet = $derived(await read({ path: page.params.path ?? '', sheet: 0 }))}
+	{const fuse = $derived(new Fuse(sheet.rows, fuseOptions))}
+	{const filtered = $derived(fuse.search(debounced.current))}
 
-			{#snippet renderItem(item)}
-				<button type="button" class="item" onclick={() => selectItem(item.refIndex)}>
-					{#each Object.entries(pick(item.item, primary)) as [key, value]}
+	{#if page.url.searchParams.has('item')}
+		{const item = Number(page.url.searchParams.get('item'))}
+
+		{#if Number.isInteger(item) && item >= 0 && item < sheet.rows.length}
+			<div class="view">
+				<div class="item">
+					{#each Object.entries(sheet.rows[item]) as [key, value]}
 						<div class="key">{key}</div>
-						<div class="value">{value}</div>
+						<div class="value">
+							{value instanceof Date ? formatDate(value) : value}
+						</div>
 					{/each}
-				</button>
-			{/snippet}
-		</SvelteVirtualList>
-	</div>
-{/if}
+				</div>
+			</div>
+		{/if}
+	{:else}
+		<div class="wrapper">
+			<SvelteVirtualList items={filtered}>
+				{#snippet header()}
+					<div class="toolbar">
+						<select
+							onchange={async (e) => {
+								const el = e.target as HTMLSelectElement;
+								await setSearchParam('sheet', el.value);
+							}}
+						>
+							{#each sheet.sheetNames as sheetName, i}
+								<option value={i}>{sheetName}</option>
+							{/each}
+						</select>
+						<input
+							type="text"
+							bind:value={searchInput}
+							aria-label="Search item"
+							placeholder="Search {['JO Number', 'Address'].join(', ')}"
+						/>
+					</div>
+				{/snippet}
+
+				{#snippet renderItem(item)}
+					<button
+						type="button"
+						class="item"
+						onclick={() => setSearchParam('item', item.refIndex)}
+					>
+						{#each Object.entries(pick(item.item, primary)) as [key, value]}
+							<div class="key">{key}</div>
+							<div class="value">{value}</div>
+						{/each}
+					</button>
+				{/snippet}
+			</SvelteVirtualList>
+		</div>
+	{/if}
+
+	{#snippet pending()}
+		<div>Loading!!!</div>
+	{/snippet}
+</svelte:boundary>
 
 <style>
 	.toolbar {
 		width: min(32rem, 100%);
-		padding: 0 1rem;
-		margin-inline: auto;
-		height: 4rem;
+		margin-bottom: 1rem;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -118,7 +127,8 @@
 	.wrapper {
 		height: 100dvh;
 
-		& :global(.virtual-list-items > div) {
+		& :global(.virtual-list-items > div),
+		& :global(:has(> .toolbar)) {
 			padding: 0 1rem;
 			display: flex;
 			justify-content: center;

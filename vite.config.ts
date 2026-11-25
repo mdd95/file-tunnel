@@ -6,6 +6,45 @@ export default defineConfig({
 	staged: {
 		'*': 'vp check --fix'
 	},
+	fmt: {
+		useTabs: true,
+		singleQuote: true,
+		trailingComma: 'none',
+		printWidth: 100,
+		sortPackageJson: true,
+		sortImports: true,
+		svelte: {},
+		associations: [
+			{
+				files: ['*.svelte'],
+				language: 'svelte'
+			}
+		],
+		ignorePatterns: [
+			'package-lock.json',
+			'pnpm-lock.yaml',
+			'yarn.lock',
+			'bun.lock',
+			'bun.lockb',
+			'/static/'
+		]
+	},
+	plugins: lazyPlugins(() => [
+		sveltekit({
+			compilerOptions: {
+				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
+				runes: ({ filename }) =>
+					filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
+				experimental: {
+					async: true
+				}
+			},
+			adapter: adapter(),
+			experimental: {
+				remoteFunctions: true
+			}
+		})
+	]),
 	lint: {
 		plugins: ['oxc', 'typescript', 'unicorn'],
 		jsPlugins: [
@@ -17,6 +56,10 @@ export default defineConfig({
 		],
 		categories: {
 			correctness: 'warn'
+		},
+		options: {
+			typeAware: true,
+			typeCheck: true
 		},
 		env: {
 			builtin: true,
@@ -38,7 +81,10 @@ export default defineConfig({
 			'!**/.env.example',
 			'!**/.env.test',
 			'**/vite.config.js.timestamp-*',
-			'**/vite.config.ts.timestamp-*'
+			'**/vite.config.ts.timestamp-*',
+			'!**/.vscode/',
+			'!.vscode/settings.json',
+			'!.vscode/extensions.json'
 		],
 		rules: {
 			'constructor-super': 'error',
@@ -205,45 +251,6 @@ export default defineConfig({
 					$host: 'readonly'
 				}
 			}
-		],
-		options: {
-			typeAware: true,
-			typeCheck: true
-		}
-	},
-	fmt: {
-		useTabs: true,
-		singleQuote: true,
-		trailingComma: 'none',
-		printWidth: 100,
-		sortPackageJson: true,
-		svelte: {},
-		associations: [
-			{
-				files: ['*.svelte'],
-				language: 'svelte'
-			}
-		],
-		ignorePatterns: [
-			'package-lock.json',
-			'pnpm-lock.yaml',
-			'yarn.lock',
-			'bun.lock',
-			'bun.lockb',
-			'/static/'
 		]
-	},
-	plugins: lazyPlugins(() => [
-		sveltekit({
-			compilerOptions: {
-				// Force runes mode for the project, except for libraries. Can be removed in svelte 6.
-				runes: ({ filename }) =>
-					filename.split(/[/\\]/).includes('node_modules') ? undefined : true,
-				experimental: {
-					async: true
-				}
-			},
-			adapter: adapter()
-		})
-	])
+	}
 });

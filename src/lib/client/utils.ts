@@ -6,6 +6,13 @@ export function isImage(fileName: string): boolean {
 	return SUPPORTED_IMAGE_EXT.has(fileName.slice(i).toLowerCase());
 }
 
+const SUPPORTS = new Set(['.xls', '.xlsb', '.xlsm', '.xlsx']);
+export function isExcel(fileName: string): boolean {
+	const i = fileName.lastIndexOf('.');
+	if (i <= 0) return false;
+	return SUPPORTS.has(fileName.slice(i).toLowerCase());
+}
+
 const K = 1024;
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB'];
 
