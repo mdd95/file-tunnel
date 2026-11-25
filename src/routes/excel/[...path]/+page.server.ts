@@ -1,14 +1,12 @@
 import { error } from '@sveltejs/kit';
-import xlsx from 'xlsx';
-
 import path from 'node:path';
-
+import xlsx from 'xlsx';
 import { resolvePath } from '#lib/server/utils.js';
-
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const filePath = await resolvePath(params.path);
+	const fileName = path.basename(filePath);
 	const fileExt = path.extname(filePath);
 
 	if (fileExt !== '.xlsx') error(403, 'File not excel');
@@ -24,6 +22,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	});
 
 	return {
+		fileName,
 		rows: data
 	};
 };

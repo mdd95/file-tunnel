@@ -1,6 +1,7 @@
 <script lang="ts">
 	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
 	import Fuse from 'fuse.js';
+	import { Debounced } from 'runed';
 	import type { PageServerData } from './$types';
 
 	type Props = {
@@ -8,6 +9,8 @@
 	};
 
 	let { data }: Props = $props();
+
+	const primary = ['JO Number', 'Nature of Work', 'Address'];
 
 	const fuse = new Fuse(data.rows, {
 		keys: ['JO Number', 'Address'],
@@ -17,20 +20,33 @@
 	});
 
 	let inp = $state('');
-	let filtered = $derived(fuse.search(inp));
+	const debounced = new Debounced(() => inp, 500);
+	let filtered = $derived(fuse.search(debounced.current));
+
+	function pick(obj: Record<string, unknown>, keys: string[]) {
+		return Object.fromEntries(keys.map((key) => [key, obj[key]]));
+	}
 </script>
+
+<svelte:head>
+	<title>{data.fileName}</title>
+</svelte:head>
 
 <div class="wrapper">
 	<SvelteVirtualList items={filtered}>
 		{#snippet header()}
 			<div class="toolbar">
-				<input type="text" bind:value={inp} />
+				<input
+					type="text"
+					bind:value={inp}
+					placeholder="Search {['JO Number', 'Address'].join(', ')}"
+				/>
 			</div>
 		{/snippet}
 
 		{#snippet renderItem(item)}
 			<div class="item">
-				{#each Object.entries(item.item) as [key, value]}
+				{#each Object.entries(pick(item.item, primary)) as [key, value]}
 					<div class="key">{key}</div>
 					<div class="value">{value}</div>
 				{/each}
@@ -42,6 +58,7 @@
 <style>
 	.toolbar {
 		width: min(32rem, 100%);
+		padding: 0 1rem;
 		margin-inline: auto;
 		height: 4rem;
 		display: flex;
@@ -56,13 +73,16 @@
 
 	.wrapper {
 		height: 100dvh;
-		display: flex;
-		flex-direction: column;
+
+		& :global(.virtual-list-items > div) {
+			padding: 0 1rem;
+			display: flex;
+			justify-content: center;
+		}
 	}
 
 	.item {
 		width: min(32rem, 100%);
-		margin-inline: auto;
 		margin-block-end: 0.5rem;
 		padding: 1rem;
 		display: grid;
@@ -73,7 +93,6 @@
 
 	.key,
 	.value {
-		padding: 0.25rem;
 		display: flex;
 		align-items: center;
 	}

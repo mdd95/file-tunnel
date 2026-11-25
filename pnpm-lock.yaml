@@ -202,6 +202,9 @@ importers:
       nanoid:
         specifier: ^6.0.2
         version: 6.0.2
+      runed:
+        specifier: ^0.38.0
+        version: 0.38.0(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       sharp:
         specifier: ^0.35.4
         version: 0.35.4(@types/node@24.13.6)
@@ -1880,6 +1883,18 @@ packages:
     resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
     engines: {node: '>= 14.18.0'}
 
+  runed@0.38.0:
+    resolution: {integrity: sha512-FHFj57uf23ORgObMisLloEsFSqP2TMzu7aGmbZSpX9NgVw1+HGoOnKTPuS4vZJ3Rk2QuFoLjt3osXAQdbMfgOw==}
+    peerDependencies:
+      '@sveltejs/kit': ^3.0.0
+      svelte: ^5.7.0
+      zod: ^4.1.0
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      zod:
+        optional: true
+
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
@@ -3244,6 +3259,15 @@ snapshots:
   react-is@17.0.2: {}
 
   readdirp@4.1.2: {}
+
+  runed@0.38.0(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
+    dependencies:
+      dequal: 2.0.3
+      esm-env: 1.2.2
+      lz-string: 1.5.0
+      svelte: 5.57.1(@typescript-eslint/types@8.70.1)
+    optionalDependencies:
+      '@sveltejs/kit': 3.1.0(@sveltejs/vite-plugin-svelte@7.3.0(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(@voidzero-dev/vite-plus-core@1.6.0(@types/node@24.13.6)(typescript@6.0.3))(svelte@5.57.1(@typescript-eslint/types@8.70.1))(typescript@6.0.3)
 
   sade@1.8.1:
     dependencies:
